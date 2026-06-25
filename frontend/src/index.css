@@ -1,0 +1,164 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 48 33% 96%;
+    --foreground: 0 0% 7%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 7%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 7%;
+    --primary: 150 32% 18%;
+    --primary-foreground: 48 33% 96%;
+    --secondary: 48 33% 90%;
+    --secondary-foreground: 0 0% 7%;
+    --muted: 48 33% 90%;
+    --muted-foreground: 0 0% 40%;
+    --accent: 38 90% 55%;
+    --accent-foreground: 0 0% 7%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 48 33% 96%;
+    --border: 48 20% 85%;
+    --input: 48 20% 85%;
+    --ring: 150 32% 18%;
+    --radius: 1rem;
+  }
+
+  .dark {
+    --background: 150 32% 18%;
+    --foreground: 48 33% 96%;
+    --card: 150 32% 18%;
+    --card-foreground: 48 33% 96%;
+    --popover: 150 32% 18%;
+    --popover-foreground: 48 33% 96%;
+    --primary: 38 90% 55%;
+    --primary-foreground: 150 32% 18%;
+    --secondary: 150 25% 25%;
+    --secondary-foreground: 48 33% 96%;
+    --muted: 150 25% 25%;
+    --muted-foreground: 48 33% 70%;
+    --accent: 38 90% 55%;
+    --accent-foreground: 0 0% 7%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 48 33% 96%;
+    --border: 150 25% 25%;
+    --input: 150 25% 25%;
+    --ring: 38 90% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+/* Animation classes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.animate-slide-in {
+  animation: slideInRight 0.3s ease-out forwards;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Chart tooltip */
+.recharts-tooltip-wrapper {
+  outline: none !important;
+}
+
+/* Input focus */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+}
+
+/* Hide arrows on number input */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Focus visible for accessibility */
+:focus-visible {
+  outline: 2px solid rgba(31, 59, 45, 0.5);
+  outline-offset: 2px;
+}
+
+/* Selection color */
+::selection {
+  background: rgba(245, 166, 35, 0.2);
+}
