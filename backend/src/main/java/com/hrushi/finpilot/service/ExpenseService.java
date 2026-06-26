@@ -1,7 +1,7 @@
-package com.hrushi.expenseiq.service;
+package com.hrushi.finpilot.service;
 
-import com.hrushi.expenseiq.entity.Expense;
-import com.hrushi.expenseiq.repository.ExpenseRepository;
+import com.hrushi.finpilot.entity.Expense;
+import com.hrushi.finpilot.repository.ExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

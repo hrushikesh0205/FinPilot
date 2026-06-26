@@ -1,6 +1,6 @@
-package com.hrushi.expenseiq.repository;
+package com.hrushi.finpilot.repository;
 
-import com.hrushi.expenseiq.entity.Expense;
+import com.hrushi.finpilot.entity.Expense;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

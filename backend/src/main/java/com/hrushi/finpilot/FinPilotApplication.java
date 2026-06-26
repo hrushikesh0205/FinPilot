@@ -1,13 +1,13 @@
-package com.hrushi.expenseiq;
+package com.hrushi.finpilot;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ExpenseiqApplication {
+public class FinPilotApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ExpenseiqApplication.class, args);
+		SpringApplication.run(FinPilotApplication.class, args);
 	}
 
 }

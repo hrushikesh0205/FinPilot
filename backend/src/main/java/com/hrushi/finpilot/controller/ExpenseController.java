@@ -1,7 +1,7 @@
-package com.hrushi.expenseiq.controller;
+package com.hrushi.finpilot.controller;
 
-import com.hrushi.expenseiq.entity.Expense;
-import com.hrushi.expenseiq.service.ExpenseService;
+import com.hrushi.finpilot.entity.Expense;
+import com.hrushi.finpilot.service.ExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

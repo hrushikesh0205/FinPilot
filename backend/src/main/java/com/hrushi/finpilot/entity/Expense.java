@@ -1,4 +1,4 @@
-package com.hrushi.expenseiq.entity;
+package com.hrushi.finpilot.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
