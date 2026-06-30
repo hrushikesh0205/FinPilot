@@ -22,15 +22,22 @@ public class UserService {
     @Autowired
     private JwtUtil jwtUtil;
 
-
+    // Register User
     public User registerUser(User user) {
 
+        // Check if email already exists
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new RuntimeException("Email already exists");
+        }
+
+        // Encrypt Password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
+        // Save User
         return userRepository.save(user);
     }
 
-
+    // Login User
     public String loginUser(LoginRequest request) {
 
         Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
