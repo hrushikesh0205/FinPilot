@@ -41,18 +41,24 @@ public class ExpenseController {
         return expenseService.getExpenseById(id);
     }
 
-    // Update Expense
+    // Update Expense (Only Owner)
     @PutMapping("/{id}")
     public Expense updateExpense(@PathVariable Long id,
-                                 @RequestBody Expense expense) {
+                                 @RequestBody Expense expense,
+                                 Authentication authentication) {
 
-        return expenseService.updateExpense(id, expense);
+        String email = authentication.getName();
+
+        return expenseService.updateExpense(id, expense, email);
     }
 
-    // Delete Expense
+    // Delete Expense (Only Owner)
     @DeleteMapping("/{id}")
-    public String deleteExpense(@PathVariable Long id) {
+    public String deleteExpense(@PathVariable Long id,
+                                Authentication authentication) {
 
-        return expenseService.deleteExpense(id);
+        String email = authentication.getName();
+
+        return expenseService.deleteExpense(id, email);
     }
 }

@@ -6,10 +6,17 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
+    // Get all expenses of logged-in user
     List<Expense> findByUser(User user);
 
+    // Find expense by id and logged-in user
+    Optional<Expense> findByIdAndUser(Long id, User user);
+
+    // Get expenses by category of logged-in user
+    List<Expense> findByCategoryAndUser(String category, User user);
 }

@@ -6,6 +6,7 @@ import com.hrushi.finpilot.repository.ExpenseRepository;
 import com.hrushi.finpilot.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.hrushi.finpilot.dto.DashboardResponse;
 
 import java.util.List;
 
@@ -41,31 +42,62 @@ public class ExpenseService {
     // Get Expense By Id
     public Expense getExpenseById(Long id) {
 
-        return expenseRepository.findById(id).orElse(null);
+        return expenseRepository.findById(id)
+                .orElse(null);
     }
 
-    // Update Expense
-    public Expense updateExpense(Long id, Expense expenseDetails) {
+    // Update Expense (Only Owner)
+    public Expense updateExpense(Long id, Expense expenseDetails, String email) {
 
-        Expense expense = expenseRepository.findById(id).orElse(null);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (expense != null) {
+        Expense expense = expenseRepository.findByIdAndUser(id, user)
+                .orElseThrow(() -> new RuntimeException("Expense not found"));
 
-            expense.setTitle(expenseDetails.getTitle());
-            expense.setAmount(expenseDetails.getAmount());
-            expense.setCategory(expenseDetails.getCategory());
+        expense.setTitle(expenseDetails.getTitle());
+        expense.setAmount(expenseDetails.getAmount());
+        expense.setCategory(expenseDetails.getCategory());
 
-            return expenseRepository.save(expense);
-        }
-
-        return null;
+        return expenseRepository.save(expense);
     }
 
-    // Delete Expense
-    public String deleteExpense(Long id) {
+    // Delete Expense (Only Owner)
+    public String deleteExpense(Long id, String email) {
 
-        expenseRepository.deleteById(id);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Expense expense = expenseRepository.findByIdAndUser(id, user)
+                .orElseThrow(() -> new RuntimeException("Expense not found"));
+
+        expenseRepository.delete(expense);
 
         return "Expense Deleted Successfully";
+    }
+    // Dashboard Summary
+    public DashboardResponse getDashboardSummary(String email) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<Expense> expenses = expenseRepository.findByUser(user);
+
+        double totalExpenses = expenses.stream()
+                .mapToDouble(Expense::getAmount)
+                .sum();
+
+        long totalTransactions = expenses.size();
+
+        double highestExpense = expenses.stream()
+                .mapToDouble(Expense::getAmount)
+                .max()
+                .orElse(0.0);
+
+        return new DashboardResponse(
+                totalExpenses,
+                totalTransactions,
+                highestExpense
+        );
     }
 }
