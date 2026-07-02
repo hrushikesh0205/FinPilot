@@ -5,7 +5,7 @@ import com.hrushi.finpilot.service.ExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
+import java.time.LocalDate;
 
 import java.util.List;
 
@@ -71,5 +71,15 @@ public class ExpenseController {
         String email = authentication.getName();
 
         return expenseService.getExpensesByCategory(category, email);
+    }
+    // Get Expenses By Date
+    @GetMapping("/date/{expenseDate}")
+    public List<Expense> getExpensesByDate(
+            @PathVariable LocalDate expenseDate,
+            Authentication authentication) {
+
+        String email = authentication.getName();
+
+        return expenseService.getExpensesByDate(expenseDate, email);
     }
 }

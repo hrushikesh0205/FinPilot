@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDate;
 
 @Repository
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
@@ -19,4 +20,6 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
     // Get expenses by category of logged-in user
     List<Expense> findByCategoryAndUser(String category, User user);
+
+    List<Expense> findByUserAndExpenseDate(User user, LocalDate expenseDate);
 }

@@ -7,7 +7,7 @@ import com.hrushi.finpilot.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.hrushi.finpilot.dto.DashboardResponse;
-
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -107,5 +107,13 @@ public class ExpenseService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         return expenseRepository.findByCategoryAndUser(category, user);
+    }
+    // Get Expenses By Date
+    public List<Expense> getExpensesByDate(LocalDate expenseDate, String email) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return expenseRepository.findByUserAndExpenseDate(user, expenseDate);
     }
 }
