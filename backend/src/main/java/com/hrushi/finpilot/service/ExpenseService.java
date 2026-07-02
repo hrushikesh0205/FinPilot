@@ -100,4 +100,12 @@ public class ExpenseService {
                 highestExpense
         );
     }
+    // Get Expenses By Category
+    public List<Expense> getExpensesByCategory(String category, String email) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return expenseRepository.findByCategoryAndUser(category, user);
+    }
 }

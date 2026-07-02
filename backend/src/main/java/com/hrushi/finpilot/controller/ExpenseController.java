@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+
 import java.util.List;
 
 @RestController
@@ -60,5 +61,15 @@ public class ExpenseController {
         String email = authentication.getName();
 
         return expenseService.deleteExpense(id, email);
+    }
+    // Get Expenses By Category
+    @GetMapping("/category/{category}")
+    public List<Expense> getExpensesByCategory(
+            @PathVariable String category,
+            Authentication authentication) {
+
+        String email = authentication.getName();
+
+        return expenseService.getExpensesByCategory(category, email);
     }
 }
