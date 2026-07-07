@@ -22,4 +22,10 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     List<Expense> findByCategoryAndUser(String category, User user);
 
     List<Expense> findByUserAndExpenseDate(User user, LocalDate expenseDate);
+
+    List<Expense> findByUserAndExpenseDateBetween(
+            User user,
+            LocalDate startDate,
+            LocalDate endDate
+    );
 }

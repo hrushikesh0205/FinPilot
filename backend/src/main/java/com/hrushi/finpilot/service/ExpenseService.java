@@ -116,4 +116,34 @@ public class ExpenseService {
 
         return expenseRepository.findByUserAndExpenseDate(user, expenseDate);
     }
+
+    // Monthly Analytics
+    public DashboardResponse getMonthlySummary(int year, int month, String email) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        LocalDate startDate = LocalDate.of(year, month, 1);
+        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+
+        List<Expense> expenses = expenseRepository
+                .findByUserAndExpenseDateBetween(user, startDate, endDate);
+
+        double totalExpenses = expenses.stream()
+                .mapToDouble(Expense::getAmount)
+                .sum();
+
+        long totalTransactions = expenses.size();
+
+        double highestExpense = expenses.stream()
+                .mapToDouble(Expense::getAmount)
+                .max()
+                .orElse(0.0);
+
+        return new DashboardResponse(
+                totalExpenses,
+                totalTransactions,
+                highestExpense
+        );
+    }
 }
