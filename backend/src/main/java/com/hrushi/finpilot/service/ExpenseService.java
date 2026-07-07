@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 import com.hrushi.finpilot.dto.DashboardResponse;
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class ExpenseService {
@@ -153,5 +156,15 @@ public class ExpenseService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         return expenseRepository.findByTitleContainingIgnoreCaseAndUser(keyword, user);
+    }
+    // Get Expenses with Pagination
+    public Page<Expense> getExpensesWithPagination(String email, int page, int size) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return expenseRepository.findByUser(user, pageable);
     }
 }

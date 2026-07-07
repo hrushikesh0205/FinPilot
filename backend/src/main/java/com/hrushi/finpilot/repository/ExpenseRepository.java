@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Optional;
 import java.time.LocalDate;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Repository
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
@@ -28,5 +30,5 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
             LocalDate startDate,
             LocalDate endDate
     );
-
+    Page<Expense> findByUser(User user, Pageable pageable);
 }

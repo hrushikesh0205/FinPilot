@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
-
+import org.springframework.data.domain.Page;
 @RestController
 @RequestMapping("/expenses")
 public class ExpenseController {
@@ -90,5 +90,16 @@ public class ExpenseController {
         String email = authentication.getName();
 
         return expenseService.searchExpenses(keyword, email);
+    }
+    // Get Expenses with Pagination
+    @GetMapping("/paginated")
+    public Page<Expense> getExpensesWithPagination(
+            @RequestParam int page,
+            @RequestParam int size,
+            Authentication authentication) {
+
+        String email = authentication.getName();
+
+        return expenseService.getExpensesWithPagination(email, page, size);
     }
 }
