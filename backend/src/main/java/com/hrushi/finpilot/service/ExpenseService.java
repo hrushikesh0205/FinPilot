@@ -12,6 +12,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @Service
 public class ExpenseService {
@@ -166,5 +167,19 @@ public class ExpenseService {
         Pageable pageable = PageRequest.of(page, size);
 
         return expenseRepository.findByUser(user, pageable);
+    }
+    // Get Expenses with Sorting
+    public List<Expense> getSortedExpenses(String email,
+                                           String field,
+                                           String direction) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(field).descending()
+                : Sort.by(field).ascending();
+
+        return expenseRepository.findByUser(user, sort);
     }
 }

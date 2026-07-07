@@ -102,4 +102,15 @@ public class ExpenseController {
 
         return expenseService.getExpensesWithPagination(email, page, size);
     }
+    // Sort Expenses
+    @GetMapping("/sort")
+    public List<Expense> sortExpenses(
+            @RequestParam String field,
+            @RequestParam(defaultValue = "asc") String direction,
+            Authentication authentication) {
+
+        String email = authentication.getName();
+
+        return expenseService.getSortedExpenses(email, field, direction);
+    }
 }
