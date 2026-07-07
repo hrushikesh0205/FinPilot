@@ -146,4 +146,12 @@ public class ExpenseService {
                 highestExpense
         );
     }
+    // Search Expenses By Title
+    public List<Expense> searchExpenses(String keyword, String email) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return expenseRepository.findByTitleContainingIgnoreCaseAndUser(keyword, user);
+    }
 }

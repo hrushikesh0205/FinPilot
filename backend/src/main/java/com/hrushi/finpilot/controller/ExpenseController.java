@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
-
+import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 @RestController
@@ -35,7 +35,7 @@ public class ExpenseController {
         return expenseService.getAllExpenses(email);
     }
 
-    // Get Expense By Id
+    // Get Expense By id
     @GetMapping("/{id}")
     public Expense getExpenseById(@PathVariable Long id) {
 
@@ -81,5 +81,14 @@ public class ExpenseController {
         String email = authentication.getName();
 
         return expenseService.getExpensesByDate(expenseDate, email);
+    }
+    @GetMapping("/search")
+    public List<Expense> searchExpenses(
+            @RequestParam String keyword,
+            Authentication authentication) {
+
+        String email = authentication.getName();
+
+        return expenseService.searchExpenses(keyword, email);
     }
 }

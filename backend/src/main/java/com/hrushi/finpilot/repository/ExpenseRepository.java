@@ -4,10 +4,10 @@ import com.hrushi.finpilot.entity.Expense;
 import com.hrushi.finpilot.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.Optional;
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Repository
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
@@ -22,10 +22,11 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     List<Expense> findByCategoryAndUser(String category, User user);
 
     List<Expense> findByUserAndExpenseDate(User user, LocalDate expenseDate);
-
+    List<Expense> findByTitleContainingIgnoreCaseAndUser(String title, User user);
     List<Expense> findByUserAndExpenseDateBetween(
             User user,
             LocalDate startDate,
             LocalDate endDate
     );
+
 }
