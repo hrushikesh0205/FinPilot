@@ -15,10 +15,12 @@ import {
   Menu,
   X,
   ChevronLeft,
+  LogOut,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useAuth } from '@/context/AuthContext';
 
 const navItems = [
   { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
@@ -36,6 +38,12 @@ const navItems = [
 
 export function Sidebar({ currentPage, setCurrentPage, collapsed, setCollapsed }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user, logout } = useAuth();
+
+  // Generate initials from user name
+  const initials = user?.name
+    ? user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
+    : '?';
 
   return (
     <>
@@ -77,7 +85,7 @@ export function Sidebar({ currentPage, setCurrentPage, collapsed, setCollapsed }
                   <Sparkles className="w-4 h-4 text-white" />
                 </div>
                 <span className="font-bold text-xl bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">
-                  ExpenseIQ
+                  FinPilot
                 </span>
               </div>
             )}
@@ -132,19 +140,46 @@ export function Sidebar({ currentPage, setCurrentPage, collapsed, setCollapsed }
           </ScrollArea>
 
           {/* User Section */}
-          {!collapsed && (
-            <div className="p-4 border-t border-border">
-              <div className="flex items-center gap-3 p-2 rounded-lg bg-muted/50">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-semibold">
-                  RS
+          <div className="p-4 border-t border-border">
+            {!collapsed ? (
+              <div className="space-y-2">
+                <div className="flex items-center gap-3 p-2 rounded-lg bg-muted/50">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+                    {initials}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{user?.name || 'User'}</p>
+                    <p className="text-xs text-muted-foreground truncate">{user?.email || ''}</p>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">Rahul Sharma</p>
-                  <p className="text-xs text-muted-foreground truncate">Premium Member</p>
-                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start gap-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                  onClick={logout}
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign Out
+                </Button>
               </div>
-            </div>
-          )}
+            ) : (
+              <TooltipProvider delayDuration={0}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="w-full text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                      onClick={logout}
+                    >
+                      <LogOut className="w-4 h-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">Sign Out</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </div>
         </div>
       </aside>
     </>
