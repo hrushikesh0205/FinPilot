@@ -27,7 +27,7 @@ public class UserService {
 
         // Check if email already exists
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already exists");
+            throw new RuntimeException("This email is already registered. Please sign in instead.");
         }
 
         // Encrypt Password
