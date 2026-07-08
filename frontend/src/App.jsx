@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ThemeProvider } from '@/context/ThemeContext';
+import { AuthProvider } from '@/context/AuthContext';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { LandingPage } from '@/pages/LandingPage';
 import { LoginPage } from '@/pages/LoginPage';
@@ -18,27 +19,44 @@ import { SettingsPage } from '@/pages/SettingsPage';
 import { HelpPage } from '@/pages/HelpPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
+const protectedPages = [
+  '/dashboard',
+  '/expenses',
+  '/categories',
+  '/accounts',
+  '/budgets',
+  '/insights',
+  '/scanner',
+  '/reports',
+  '/notifications',
+  '/profile',
+  '/settings',
+  '/help',
+];
+
 function App() {
   const [currentPage, setCurrentPage] = useState('/');
 
-  const appPages = [
-    '/dashboard',
-    '/expenses',
-    '/categories',
-    '/accounts',
-    '/budgets',
-    '/insights',
-    '/scanner',
-    '/reports',
-    '/notifications',
-    '/profile',
-    '/settings',
-    '/help',
-  ];
+  const isAppPage = protectedPages.includes(currentPage);
+  const isAuthenticated = () => !!localStorage.getItem('token');
 
-  const isAppPage = appPages.includes(currentPage);
+  // Redirect to login if accessing protected page without token
+  useEffect(() => {
+    if (isAppPage && !isAuthenticated()) {
+      setCurrentPage('/login');
+    }
+  }, [currentPage, isAppPage]);
+
+  const handleLogout = () => {
+    setCurrentPage('/login');
+  };
 
   const renderPage = () => {
+    // Guard: redirect unauthenticated users trying to access protected pages
+    if (isAppPage && !isAuthenticated()) {
+      return <LoginPage setCurrentPage={setCurrentPage} />;
+    }
+
     switch (currentPage) {
       case '/':
         return <LandingPage setCurrentPage={setCurrentPage} />;
@@ -47,7 +65,7 @@ function App() {
       case '/register':
         return <RegisterPage setCurrentPage={setCurrentPage} />;
       case '/dashboard':
-        return <DashboardPage />;
+        return <DashboardPage setCurrentPage={setCurrentPage} />;
       case '/expenses':
         return <ExpensesPage />;
       case '/categories':
@@ -77,13 +95,15 @@ function App() {
 
   return (
     <ThemeProvider defaultTheme="light">
-      {isAppPage ? (
-        <AppLayout currentPage={currentPage} setCurrentPage={setCurrentPage}>
-          {renderPage()}
-        </AppLayout>
-      ) : (
-        renderPage()
-      )}
+      <AuthProvider onLogout={handleLogout}>
+        {isAppPage ? (
+          <AppLayout currentPage={currentPage} setCurrentPage={setCurrentPage}>
+            {renderPage()}
+          </AppLayout>
+        ) : (
+          renderPage()
+        )}
+      </AuthProvider>
     </ThemeProvider>
   );
 }

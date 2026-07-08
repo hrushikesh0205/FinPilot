@@ -3,8 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Sparkles, Eye, EyeOff, Mail, Lock, User, ArrowLeft, Check } from 'lucide-react';
+import { Sparkles, Eye, EyeOff, Mail, Lock, User, ArrowLeft, Check, AlertCircle, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/context/AuthContext';
 
 export function RegisterPage({ setCurrentPage }) {
   const [name, setName] = useState('');
@@ -12,7 +13,9 @@ export function RegisterPage({ setCurrentPage }) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const { register, loading } = useAuth();
 
   const passwordStrength = () => {
     let strength = 0;
@@ -39,17 +42,35 @@ export function RegisterPage({ setCurrentPage }) {
     return 'Strong';
   };
 
-  const handleSubmit = (e) => {
+  const validateEmail = (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      alert('Passwords do not match');
+    setErrorMsg('');
+
+    if (!name.trim()) {
+      setErrorMsg('Full name is required.');
       return;
     }
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    if (!validateEmail(email)) {
+      setErrorMsg('Please enter a valid email address.');
+      return;
+    }
+    if (password.length < 6) {
+      setErrorMsg('Password must be at least 6 characters.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setErrorMsg('Passwords do not match.');
+      return;
+    }
+
+    const result = await register(name.trim(), email, password);
+    if (result.success) {
       setCurrentPage('/dashboard');
-    }, 1000);
+    } else {
+      setErrorMsg(result.message || 'Registration failed. Please try again.');
+    }
   };
 
   return (
@@ -89,43 +110,13 @@ export function RegisterPage({ setCurrentPage }) {
           </CardHeader>
 
           <CardContent className="space-y-4">
-            {/* Social Login */}
-            <Button
-              variant="outline"
-              className="w-full gap-2 h-11"
-              onClick={() => setCurrentPage('/dashboard')}
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
-                <path
-                  fill="currentColor"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.28v2.7h3.57c2.08-1.92 3.28-4.74 3.28-7.99z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.27H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.73l2.52-1.91.99-.73h1.15z"
-                />
-                <path
-                  fill="#EA4335"
-                  d="M12 5.14c1.61 0 3.06.55 4.21 1.64l3.57-3.57C17.45 1.18 14.97 0 12 0 7.7 0 3.99 2.53 2.18 6.27l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                />
-              </svg>
-              Continue with Google
-            </Button>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
+            {/* Error Banner */}
+            {errorMsg && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-sm">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <span>{errorMsg}</span>
               </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">
-                  Or continue with
-                </span>
-              </div>
-            </div>
+            )}
 
             {/* Register Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -136,11 +127,12 @@ export function RegisterPage({ setCurrentPage }) {
                   <Input
                     id="name"
                     type="text"
-                    placeholder="Rahul Sharma"
+                    placeholder="Your Name"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => { setName(e.target.value); setErrorMsg(''); }}
                     className="pl-10 h-11"
                     required
+                    disabled={loading}
                   />
                 </div>
               </div>
@@ -154,9 +146,10 @@ export function RegisterPage({ setCurrentPage }) {
                     type="email"
                     placeholder="you@example.com"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => { setEmail(e.target.value); setErrorMsg(''); }}
                     className="pl-10 h-11"
                     required
+                    disabled={loading}
                   />
                 </div>
               </div>
@@ -170,14 +163,16 @@ export function RegisterPage({ setCurrentPage }) {
                     type={showPassword ? 'text' : 'password'}
                     placeholder="Create a strong password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => { setPassword(e.target.value); setErrorMsg(''); }}
                     className="pl-10 pr-10 h-11"
                     required
+                    disabled={loading}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2"
+                    disabled={loading}
                   >
                     {showPassword ? (
                       <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -224,12 +219,13 @@ export function RegisterPage({ setCurrentPage }) {
                     type="password"
                     placeholder="Confirm your password"
                     value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    onChange={(e) => { setConfirmPassword(e.target.value); setErrorMsg(''); }}
                     className={cn(
                       'pl-10 h-11',
                       confirmPassword && password === confirmPassword && 'border-emerald-500'
                     )}
                     required
+                    disabled={loading}
                   />
                   {confirmPassword && password === confirmPassword && (
                     <Check className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-500" />
@@ -254,9 +250,16 @@ export function RegisterPage({ setCurrentPage }) {
               <Button
                 type="submit"
                 className="w-full h-11 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700"
-                disabled={isLoading}
+                disabled={loading}
               >
-                {isLoading ? 'Creating account...' : 'Create Account'}
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Creating account...
+                  </span>
+                ) : (
+                  'Create Account'
+                )}
               </Button>
             </form>
           </CardContent>
@@ -277,7 +280,7 @@ export function RegisterPage({ setCurrentPage }) {
 
       {/* Footer */}
       <footer className="relative z-10 p-4 text-center text-sm text-muted-foreground">
-        &copy; 2024 ExpenseIQ. All rights reserved.
+        &copy; 2024 FinPilot. All rights reserved.
       </footer>
     </div>
   );
