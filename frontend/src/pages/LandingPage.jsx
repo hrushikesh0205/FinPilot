@@ -85,10 +85,10 @@ const FAQS = [
 ];
 
 const NAV = [
-  { label: 'Features',     id: 'features' },
-  { label: 'AI Insights',  id: 'ai-insights' },
-  { label: 'Testimonials', id: 'testimonials' },
-  { label: 'FAQ',          id: 'faq' },
+  { label: 'Platform',     id: 'features' },
+  { label: 'AI Advisor',  id: 'ai-insights' },
+  { label: 'Review', id: 'testimonials' },
+  { label: 'Help Center',          id: 'faq' },
 ];
 
 const AI_INSIGHTS = [
@@ -142,7 +142,7 @@ export function LandingPage({ setCurrentPage }) {
             : 'bg-transparent',
         )}
       >
-        <div className="max-w-[1280px] mx-auto px-5 md:px-10">
+        <div className="max-w-[1440px] mx-auto px-4 md:px-8">
           <div className="flex items-center justify-between h-16 md:h-[70px]">
 
             {/* Logo */}
@@ -238,7 +238,7 @@ export function LandingPage({ setCurrentPage }) {
       </nav>
 
       {/* ══ HERO ════════════════════════════════════════════════════════════ */}
-      <section className="relative pt-24 md:pt-32 pb-16 md:pb-24 overflow-hidden">
+      <section className="relative pt-24 md:pt-28 pb-12 md:pb-20 overflow-hidden">
         {/* Ambient gradient orbs */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
           <div style={{
@@ -253,7 +253,7 @@ export function LandingPage({ setCurrentPage }) {
           }} />
         </div>
 
-        <div className="max-w-[1280px] mx-auto px-5 md:px-10 relative z-10">
+        <div className="max-w-[1440px] mx-auto px-4 md:px-8 relative z-10">
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
 
             {/* ── Left: copy ── */}
@@ -269,48 +269,51 @@ export function LandingPage({ setCurrentPage }) {
 
               {/* Headline */}
               <h1
-                className="text-4xl sm:text-5xl lg:text-[3.35rem] font-bold tracking-tight leading-[1.09] mb-5"
+                className="text-[2.65rem] sm:text-5xl lg:text-[3.35rem] font-bold tracking-tight leading-[1.08] mb-4"
                 style={{ color: '#111827' }}
               >
-                Take Control of<br />
-                Your Money,<br />
-                <span className="fp-gradient-text">Effortlessly.</span>
+                Spend Smarter.<br />
+                Save Better.<br />
+                <span className="fp-gradient-text">Grow Faster.</span>
               </h1>
 
               {/* Sub-headline */}
-              <p className="text-base sm:text-lg leading-relaxed mb-7 max-w-lg" style={{ color: '#4B5563' }}>
-                FinPilot uses AI to track expenses, optimize budgets, and deliver personalized
-                insights — helping you save more every month without the hassle.
+              <p className="text-[1.05rem] sm:text-lg leading-[1.7] mb-7 max-w-lg" style={{ color: '#4B5563' }}>
+                Take control of your finances with intelligent expense tracking, smart budgeting,
+                and personalized AI insights — all in one secure platform.
               </p>
 
-              {/* Trust badges */}
-              <div className="flex flex-wrap gap-2 mb-8">
-                {[
-                  { icon: Shield, label: 'Bank-grade security' },
-                  { icon: Zap,    label: 'AI-powered insights' },
-                  { icon: Check,  label: 'Free to get started' },
-                ].map(({ icon: Icon, label }) => (
-                  <div
-                    key={label}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold"
-                    style={{ background: '#F0FDF4', color: '#166534' }}
-                  >
-                    <Icon className="w-3 h-3" style={{ color: C.accent }} />
-                    {label}
-                  </div>
-                ))}
-              </div>
+{/*                */}{/* Trust badges */}
+{/*               <div className="flex flex-wrap gap-2 mb-8"> */}
+{/*                 {[ */}
+{/*                   { icon: Shield, label: 'Bank-grade security' }, */}
+{/*                   { icon: Zap,    label: 'AI-powered insights' }, */}
+{/*                   { icon: Check,  label: 'Free to get started' }, */}
+{/*                 ].map(({ icon: Icon, label }) => ( */}
+{/*                   <div */}
+{/*                     key={label} */}
+{/*                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold" */}
+{/*                     style={{ background: '#F0FDF4', color: '#166534' }} */}
+{/*                   > */}
+{/*                     <Icon className="w-3 h-3" style={{ color: C.accent }} /> */}
+{/*                     {label} */}
+{/*                   </div> */}
+{/*                 ))} */}
+{/*               </div> */}
 
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row gap-3 mb-10">
                 <button
                   onClick={() => setCurrentPage('/register')}
+
                   className="inline-flex items-center justify-center gap-2 text-white font-semibold px-7 py-3.5 rounded-full transition-all duration-200 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
                   style={{ background: C.primary, boxShadow: '0 4px 18px rgba(15,61,46,0.28)' }}
                 >
-                  Get Started Free <ArrowRight className="w-4 h-4" />
+                  Start Saving Today  <ArrowRight className="w-4 h-4" />
                 </button>
                 <button
+                onClick={() => setCurrentPage('/login')}
+
                   className="inline-flex items-center justify-center gap-3 font-semibold px-7 py-3.5 rounded-full border transition-all duration-200 hover:bg-white hover:shadow-md"
                   style={{ borderColor: '#E5E7EB', color: '#374151', background: 'transparent' }}
                 >
@@ -320,15 +323,15 @@ export function LandingPage({ setCurrentPage }) {
                   >
                     <Play className="w-3 h-3 fill-current ml-0.5" style={{ color: C.accent }} />
                   </span>
-                  Watch Demo
+                  Login to Account
                 </button>
               </div>
 
               {/* Stats row */}
               <div className="flex items-center gap-8 pt-6 border-t border-gray-100">
                 {[
-                  { val: '50K+',    lbl: 'Active users' },
-                  { val: '₹500Cr+', lbl: 'Tracked' },
+                  { val: '50+',    lbl: 'Active users' },
+                  { val: '₹100k+', lbl: 'Tracked' },
                   { val: '4.9★',    lbl: 'App rating' },
                 ].map((s, i) => (
                   <div key={i}>
@@ -494,42 +497,86 @@ export function LandingPage({ setCurrentPage }) {
         </div>
       </section>
 
-      {/* ══ LOGO TRUST BAR ══════════════════════════════════════════════════ */}
-      <div className="py-10 bg-white border-y border-gray-100">
-        <div className="max-w-[1280px] mx-auto px-5 md:px-10">
-          <p className="text-center text-[10px] font-bold tracking-[0.2em] uppercase text-gray-300 mb-6">
-            Trusted by teams at
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-14">
-            {['Google', 'Microsoft', 'TechFlow', 'Razorpay', 'Zerodha'].map(name => (
-              <span key={name} className="text-sm font-bold text-gray-200 tracking-wide">{name}</span>
-            ))}
+      {/* ═════════ WHY FINPILOT ═════════ */}
+      <div className="pt-12 pb-4 bg-gradient-to-b from-white to-emerald-50/40 border-y border-emerald-100/60">
+        <div className="max-w-[1440px] mx-auto px-4 md:px-8">
+
+          <div className="text-center mb-10">
+            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-emerald-600">
+              WHY FINPILOT
+            </p>
+
+            <h2 className="mt-3 text-3xl md:text-4xl font-bold text-slate-900">
+              Built for
+              <span className="text-emerald-600"> smarter financial decisions</span>
+            </h2>
+
+            <p className="mt-4 max-w-2xl mx-auto text-gray-600 text-lg">
+              Everything you need to track expenses, manage budgets, and grow your savings with AI-powered insights.
+            </p>
           </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+
+            <div className="rounded-2xl border border-gray-200 bg-white p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:border-emerald-300 hover:shadow-[0_15px_45px_rgba(22,163,74,0.15)]">
+              <div className="text-3xl mb-3">📊</div>
+              <h3 className="font-semibold text-slate-900">Smart Tracking</h3>
+              <p className="mt-2 text-sm text-gray-500">
+                Automatic expense categorization.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-gray-200 bg-white p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:border-emerald-300 hover:shadow-[0_15px_45px_rgba(22,163,74,0.15)]">
+              <div className="text-3xl mb-3">🤖</div>
+              <h3 className="font-semibold text-slate-900">AI Advisor</h3>
+              <p className="mt-2 text-sm text-gray-500">
+                Personalized saving recommendations.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-gray-200 bg-white p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:border-emerald-300 hover:shadow-[0_15px_45px_rgba(22,163,74,0.15)]">
+              <div className="text-3xl mb-3">🎯</div>
+              <h3 className="font-semibold text-slate-900">Budget Goals</h3>
+              <p className="mt-2 text-sm text-gray-500">
+                Stay on track with monthly budgets.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-gray-200 bg-white p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:border-emerald-300 hover:shadow-[0_15px_45px_rgba(22,163,74,0.15)]">
+              <div className="text-3xl mb-3">🔒</div>
+              <h3 className="font-semibold text-slate-900">Secure Platform</h3>
+              <p className="mt-2 text-sm text-gray-500">
+                Bank-grade security for your data.
+              </p>
+            </div>
+
+          </div>
+
         </div>
       </div>
 
       {/* ══ FEATURES ════════════════════════════════════════════════════════ */}
-      <section id="features" className="py-24 md:py-32 bg-white">
+      <section id="features" className="pt-12 pb-24 md:pt-24 md:pb-24 bg-white">
         <FeaturesSection />
       </section>
 
       {/* ══ AI INSIGHTS ═════════════════════════════════════════════════════ */}
-      <section id="ai-insights" className="py-24 md:py-32" style={{ background: C.primary }}>
+      <section id="ai-insights" className="py-20 md:py-24" style={{ background: C.primary }}>
         <AISection />
       </section>
 
       {/* ══ TESTIMONIALS ════════════════════════════════════════════════════ */}
-      <section id="testimonials" className="py-24 md:py-32" style={{ background: C.bg }}>
+      <section id="testimonials" className="py-20 md:py-24" style={{ background: C.bg }}>
         <TestimonialsSection />
       </section>
 
       {/* ══ FAQ ═════════════════════════════════════════════════════════════ */}
-      <section id="faq" className="py-24 md:py-32 bg-white">
+      <section id="faq" className="py-20 md:py-24 bg-white">
         <FAQSection openFaq={openFaq} setOpenFaq={setOpenFaq} />
       </section>
 
       {/* ══ CTA ═════════════════════════════════════════════════════════════ */}
-      <section className="py-16 md:py-24" style={{ background: C.bg }}>
+      <section className="py-16 md:py-20" style={{ background: C.bg }}>
         <CTABanner setCurrentPage={setCurrentPage} />
       </section>
 
@@ -547,20 +594,20 @@ function FeaturesSection() {
   const [gridRef, gridVisible]     = useReveal(0.08);
 
   return (
-    <div className="max-w-[1280px] mx-auto px-5 md:px-10">
+    <div className="max-w-[1440px] mx-auto px-4 md:px-8">
       {/* Section header */}
       <div
         ref={headerRef}
-        className={cn('text-center max-w-2xl mx-auto mb-14', headerVisible ? 'fp-anim-up' : 'opacity-0')}
+        className={cn('text-center max-w-2xl mx-auto mb-12', headerVisible ? 'fp-anim-up' : 'opacity-0')}
       >
-        <span className="text-xs font-bold tracking-[0.16em] uppercase inline-block mb-4" style={{ color: C.accent }}>
+        <span className="text-[11px] font-bold tracking-[0.16em] uppercase inline-block mb-3" style={{ color: C.accent }}>
           FEATURES
         </span>
-        <h2 className="text-3xl sm:text-[2.5rem] font-bold tracking-tight leading-[1.15] mb-4" style={{ color: '#111827' }}>
+        <h2 className="text-[2rem] sm:text-[2.4rem] font-bold tracking-tight leading-[1.12] mb-3" style={{ color: '#111827' }}>
           Everything you need to{' '}
           <span style={{ color: C.primary }}>manage money smarter</span>
         </h2>
-        <p className="text-gray-500 leading-relaxed">
+        <p className="text-[0.95rem] text-gray-500 leading-[1.7] max-w-lg mx-auto">
           Powerful tools designed to give you complete control over your financial life.
         </p>
       </div>
@@ -573,19 +620,18 @@ function FeaturesSection() {
             <div
               key={i}
               className={cn(
-                'group p-7 rounded-2xl border border-gray-100 cursor-pointer',
-                'transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-transparent',
+                'fp-feature-card group p-7 rounded-2xl bg-white cursor-pointer',
                 gridVisible ? `fp-stagger-${i}` : 'opacity-0',
               )}
             >
               <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110"
+                className="w-12 h-12 rounded-xl flex items-center justify-center mb-5 transition-transform duration-280 group-hover:scale-110"
                 style={{ background: bg }}
               >
                 <Icon className="w-6 h-6" style={{ color }} />
               </div>
-              <h3 className="font-semibold text-[15px] mb-2" style={{ color: '#111827' }}>{title}</h3>
-              <p className="text-sm leading-relaxed text-gray-500">{desc}</p>
+              <h3 className="font-semibold text-[15px] mb-2 leading-snug" style={{ color: '#111827' }}>{title}</h3>
+              <p className="text-[13.5px] leading-[1.65] text-gray-500">{desc}</p>
             </div>
           );
         })}
@@ -601,7 +647,7 @@ function AISection() {
   const [ref, visible] = useReveal(0.1);
 
   return (
-    <div ref={ref} className="max-w-[1280px] mx-auto px-5 md:px-10">
+    <div ref={ref} className="max-w-[1440px] mx-auto px-4 md:px-8">
       <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
         {/* Left — copy & insight list */}
@@ -729,42 +775,41 @@ function TestimonialsSection() {
   const [gridRef, gridVisible]     = useReveal(0.08);
 
   return (
-    <div className="max-w-[1280px] mx-auto px-5 md:px-10">
+    <div className="max-w-[1440px] mx-auto px-4 md:px-8">
       {/* Header */}
       <div
         ref={headerRef}
-        className={cn('text-center max-w-xl mx-auto mb-14', headerVisible ? 'fp-anim-up' : 'opacity-0')}
+        className={cn('text-center max-w-xl mx-auto mb-12', headerVisible ? 'fp-anim-up' : 'opacity-0')}
       >
-        <span className="text-xs font-bold tracking-[0.16em] uppercase inline-block mb-4" style={{ color: C.accent }}>
-          TESTIMONIALS
+        <span className="text-[11px] font-bold tracking-[0.16em] uppercase inline-block mb-3" style={{ color: C.accent }}>
+          REVIEW
         </span>
-        <h2 className="text-3xl sm:text-[2.5rem] font-bold tracking-tight mb-4" style={{ color: '#111827' }}>
+        <h2 className="text-[2rem] sm:text-[2.4rem] font-bold tracking-tight leading-[1.12] mb-3" style={{ color: '#111827' }}>
           Loved by <span style={{ color: C.primary }}>thousands</span>
         </h2>
-        <p className="text-gray-500 leading-relaxed">
+        <p className="text-[0.95rem] text-gray-500 leading-[1.7]">
           Real people, real results. See how FinPilot has transformed the way they manage money.
         </p>
       </div>
 
       {/* Cards */}
-      <div ref={gridRef} className="grid md:grid-cols-3 gap-5 mb-12">
+      <div ref={gridRef} className="grid md:grid-cols-3 gap-5 mb-10">
         {TESTIMONIALS.map((t, i) => (
           <div
             key={i}
             className={cn(
-              'group p-7 rounded-2xl border border-gray-100 bg-white cursor-pointer',
-              'transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-transparent',
+              'fp-card p-7 rounded-2xl border border-gray-100 bg-white cursor-pointer',
               gridVisible ? `fp-stagger-${i}` : 'opacity-0',
             )}
           >
             {/* Stars */}
             <div className="flex items-center gap-0.5 mb-4">
               {Array.from({ length: 5 }).map((_, j) => (
-                <Star key={j} className="w-4 h-4 fill-current" style={{ color: C.amber }} />
+                <Star key={j} className="w-[14px] h-[14px] fill-current" style={{ color: C.amber }} />
               ))}
             </div>
             {/* Quote */}
-            <p className="text-sm leading-relaxed mb-6 text-gray-600">"{t.text}"</p>
+            <p className="text-[13.5px] leading-[1.7] mb-6 text-gray-600">"{t.text}"</p>
             {/* Author */}
             <div className="flex items-center gap-3">
               <div
@@ -774,8 +819,8 @@ function TestimonialsSection() {
                 {t.initials}
               </div>
               <div>
-                <p className="font-semibold text-sm" style={{ color: '#111827' }}>{t.name}</p>
-                <p className="text-xs text-gray-400">{t.role}, {t.company}</p>
+                <p className="font-semibold text-[13.5px]" style={{ color: '#111827' }}>{t.name}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{t.role}, {t.company}</p>
               </div>
             </div>
           </div>
@@ -824,12 +869,12 @@ function FAQSection({ openFaq, setOpenFaq }) {
       {/* Header */}
       <div
         ref={headerRef}
-        className={cn('text-center mb-14', headerVisible ? 'fp-anim-up' : 'opacity-0')}
+        className={cn('text-center mb-12', headerVisible ? 'fp-anim-up' : 'opacity-0')}
       >
-        <span className="text-xs font-bold tracking-[0.16em] uppercase inline-block mb-4" style={{ color: C.accent }}>
+        <span className="text-[11px] font-bold tracking-[0.16em] uppercase inline-block mb-3" style={{ color: C.accent }}>
           FAQ
         </span>
-        <h2 className="text-3xl sm:text-[2.5rem] font-bold tracking-tight" style={{ color: '#111827' }}>
+        <h2 className="text-[2rem] sm:text-[2.4rem] font-bold tracking-tight leading-[1.12]" style={{ color: '#111827' }}>
           Frequently asked questions
         </h2>
       </div>
@@ -886,7 +931,7 @@ function CTABanner({ setCurrentPage }) {
   const [ref, visible] = useReveal();
 
   return (
-    <div className="max-w-[1280px] mx-auto px-5 md:px-10">
+    <div className="max-w-[1440px] mx-auto px-4 md:px-8">
       <div
         ref={ref}
         className={cn(
@@ -937,7 +982,7 @@ function CTABanner({ setCurrentPage }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════
-   FOOTER
+   FOOTER  (dark green, premium)
 ══════════════════════════════════════════════════════════════════════════════ */
 function SiteFooter({ setCurrentPage }) {
   const FOOTER_LINKS = {
@@ -946,33 +991,66 @@ function SiteFooter({ setCurrentPage }) {
     Resources: ['Documentation', 'Help Center', 'Community', 'Status'],
   };
 
-  return (
-    <footer className="bg-white border-t border-gray-100">
-      <div className="max-w-[1280px] mx-auto px-5 md:px-10 pt-16 pb-10">
+  const FG    = 'rgba(255,255,255,0.72)';   // body text
+  const FG_DIM = 'rgba(255,255,255,0.38)';  // muted text
+  const FG_HEAD = 'rgba(255,255,255,0.38)'; // column headers
 
-        {/* Top grid */}
-        <div className="grid grid-cols-2 md:grid-cols-[1.8fr_1fr_1fr_1fr] gap-10 md:gap-6 mb-14">
+  return (
+    <footer style={{ background: C.primary }}>
+
+      {/* ── Main content ── */}
+      <div className="max-w-[1440px] mx-auto px-4 md:px-8 pt-14 pb-0">
+
+        {/* Top grid: brand + links */}
+        <div className="grid grid-cols-2 md:grid-cols-[2fr_1fr_1fr_1fr] gap-10 md:gap-8 mb-12">
+
           {/* Brand column */}
           <div className="col-span-2 md:col-span-1">
-            <FinPilotLogo size={32} />
-            <p className="text-sm leading-relaxed mt-4 mb-6 max-w-[210px] text-gray-400">
-              AI-powered personal finance platform that helps you track, budget, and grow your money.
+            {/* Logo — white text override */}
+            <div className="flex items-center gap-2.5 select-none mb-4">
+              <div
+                style={{
+                  width: 34, height: 34,
+                  borderRadius: Math.round(34 * 0.28),
+                  background: 'linear-gradient(145deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.06) 100%)',
+                  border: '1px solid rgba(255,255,255,0.14)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                }}
+              >
+                <svg width={20} height={20} viewBox="0 0 22 22" fill="none">
+                  <polyline points="2,17 8,10 13,13 20,4" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+                  <circle cx="20" cy="4" r="2.2" fill={C.amber} />
+                  <line x1="2" y1="20" x2="20" y2="20" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeOpacity="0.28" />
+                </svg>
+              </div>
+              <span style={{ color: '#fff', fontSize: 18, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1 }}>
+                FinPilot
+              </span>
+            </div>
+
+            <p className="text-[13.5px] leading-[1.68] mb-6 max-w-[200px]" style={{ color: FG }}>
+              AI-powered personal finance that helps you track, budget, and grow your wealth.
             </p>
-            {/* Social links */}
+
+            {/* Social icons */}
             <div className="flex items-center gap-2">
               {[
-                { Icon: Twitter, label: 'Twitter' },
+                { Icon: Twitter,  label: 'Twitter' },
                 { Icon: Linkedin, label: 'LinkedIn' },
-                { Icon: Github, label: 'GitHub' },
+                { Icon: Github,   label: 'GitHub' },
               ].map(({ Icon, label }) => (
                 <a
                   key={label}
                   href="#"
                   aria-label={label}
-                  className="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-200 hover:bg-gray-100 hover:shadow-sm"
-                  style={{ background: '#F9FAFB' }}
+                  className="fp-social-icon w-9 h-9 rounded-xl flex items-center justify-center"
+                  style={{
+                    background: 'rgba(255,255,255,0.07)',
+                    border: '1px solid rgba(255,255,255,0.10)',
+                    color: FG,
+                  }}
                 >
-                  <Icon className="w-4 h-4 text-gray-400" />
+                  <Icon className="w-[15px] h-[15px]" />
                 </a>
               ))}
             </div>
@@ -981,13 +1059,19 @@ function SiteFooter({ setCurrentPage }) {
           {/* Link columns */}
           {Object.entries(FOOTER_LINKS).map(([title, items]) => (
             <div key={title}>
-              <p className="text-[11px] font-bold tracking-[0.14em] uppercase text-gray-300 mb-4">{title}</p>
-              <ul className="space-y-3">
+              <p
+                className="text-[10.5px] font-bold tracking-[0.16em] uppercase mb-4"
+                style={{ color: FG_HEAD }}
+              >{title}</p>
+              <ul className="space-y-2.5">
                 {items.map(item => (
                   <li key={item}>
                     <a
                       href="#"
-                      className="text-sm text-gray-500 hover:text-gray-900 transition-colors duration-150"
+                      className="text-[13.5px] transition-colors duration-150"
+                      style={{ color: FG }}
+                      onMouseEnter={e => e.currentTarget.style.color = '#fff'}
+                      onMouseLeave={e => e.currentTarget.style.color = FG}
                     >
                       {item}
                     </a>
@@ -1000,26 +1084,31 @@ function SiteFooter({ setCurrentPage }) {
 
         {/* Newsletter strip */}
         <div
-          className="rounded-xl p-5 mb-10 border border-gray-100"
-          style={{ background: C.bg }}
+          className="rounded-2xl px-6 py-6 mb-10"
+          style={{
+            background: 'rgba(255,255,255,0.04)',
+            border: '1px solid rgba(255,255,255,0.09)',
+          }}
         >
-          <div className="flex flex-col md:flex-row items-center gap-4">
-            <div className="flex-1 text-center md:text-left">
-              <p className="font-semibold text-sm" style={{ color: '#111827' }}>Stay in the loop</p>
-              <p className="text-xs text-gray-400 mt-0.5">
-                Get the latest updates and financial tips delivered to your inbox.
+          <div className="flex flex-col md:flex-row items-center gap-5">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <Send className="w-3.5 h-3.5" style={{ color: C.amber }} />
+                <p className="font-semibold text-sm text-white">Stay in the loop</p>
+              </div>
+              <p className="text-[12.5px]" style={{ color: FG_DIM }}>
+                Weekly financial tips, product updates, and AI insights — delivered free.
               </p>
             </div>
-            <div className="flex w-full md:w-auto gap-2">
+            <div className="flex w-full md:w-auto gap-2 flex-shrink-0">
               <input
                 type="email"
                 placeholder="your@email.com"
-                className="flex-1 md:w-52 px-4 py-2.5 rounded-full text-sm bg-white border border-gray-200 focus:border-green-300 transition-colors"
-                style={{ color: '#111827' }}
+                className="fp-nl-input flex-1 md:w-52 px-4 py-2.5 rounded-xl text-sm outline-none"
               />
               <button
-                className="px-5 py-2.5 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-[0.97]"
-                style={{ background: C.primary }}
+                className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 hover:opacity-90 active:scale-[0.97] whitespace-nowrap"
+                style={{ background: C.amber, color: '#111' }}
               >
                 Subscribe
               </button>
@@ -1028,13 +1117,23 @@ function SiteFooter({ setCurrentPage }) {
         </div>
 
         {/* Bottom bar */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-8 border-t border-gray-100">
-          <p className="text-xs text-gray-300">
-            © {new Date().getFullYear()} FinPilot. All rights reserved.
+        <div
+          className="flex flex-col md:flex-row items-center justify-between gap-3 py-5"
+          style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}
+        >
+          <p className="text-xs" style={{ color: FG_DIM }}>
+            © {new Date().getFullYear()} FinPilot, Inc. All rights reserved.
           </p>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-5">
             {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map(l => (
-              <a key={l} href="#" className="text-xs text-gray-300 hover:text-gray-600 transition-colors duration-150">
+              <a
+                key={l}
+                href="#"
+                className="text-xs transition-colors duration-150"
+                style={{ color: FG_DIM }}
+                onMouseEnter={e => e.currentTarget.style.color = 'rgba(255,255,255,0.65)'}
+                onMouseLeave={e => e.currentTarget.style.color = FG_DIM}
+              >
                 {l}
               </a>
             ))}
