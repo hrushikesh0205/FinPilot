@@ -18,7 +18,7 @@ export function AppLayout({ children, currentPage, setCurrentPage }) {
       <main
         className={cn(
           'pt-16 min-h-screen transition-all duration-300',
-          'pl-0 lg:pl-[260px]'
+          collapsed ? 'pl-[70px]' : 'pl-0 lg:pl-[240px]'
         )}
       >
         <div className="p-4 lg:p-6">

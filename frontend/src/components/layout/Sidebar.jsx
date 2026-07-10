@@ -68,8 +68,8 @@ export function Sidebar({ currentPage, setCurrentPage, collapsed, setCollapsed }
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed left-0 top-0 z-40 h-screen bg-card border-r border-border transition-all duration-300 ease-in-out',
-          collapsed ? 'w-[70px]' : 'w-[260px]',
+          'fixed left-0 top-0 z-40 h-screen bg-card dark:bg-[#0B3D2E] border-r border-border transition-all duration-300 ease-in-out',
+          collapsed ? 'w-[70px]' : 'w-[220px]',
           mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
       >
@@ -119,12 +119,12 @@ export function Sidebar({ currentPage, setCurrentPage, collapsed, setCollapsed }
                         className={cn(
                           'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200',
                           currentPage === item.path
-                            ? 'bg-gradient-to-r from-emerald-500/10 to-teal-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
-                            : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                            ? 'bg-[#0F3D2E] dark:bg-[#16A34A] text-white shadow-md shadow-[#0F3D2E]/20 dark:shadow-[#16A34A]/20'
+                            : 'text-muted-foreground hover:bg-[#0F3D2E]/5 dark:hover:bg-[#14532D] hover:text-[#0F3D2E] dark:hover:text-emerald-50 transition-all duration-300',
                           collapsed && 'justify-center'
                         )}
                       >
-                        <item.icon className="w-5 h-5 flex-shrink-0" />
+                        <item.icon className="w-[24px] h-[24px] flex-shrink-0 transition-transform group-hover:scale-110" />
                         {!collapsed && <span>{item.name}</span>}
                       </button>
                     </TooltipTrigger>
