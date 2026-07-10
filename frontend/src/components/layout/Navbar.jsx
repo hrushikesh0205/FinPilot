@@ -13,19 +13,34 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/context/ThemeContext';
+import { useAuth } from '@/context/AuthContext';
 import { notifications } from '@/data/mockData';
 
 export function Navbar({ collapsed }) {
   const { theme, setTheme } = useTheme();
+  const { user, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const unreadCount = notifications.filter(n => !n.read).length;
+
+  const getInitials = (name) => {
+    if (!name) return 'U';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  };
+
+  const userName = user?.name || 'User';
+  const userEmail = user?.email || '';
+  const initials = getInitials(userName);
 
   return (
     <header
       className={cn(
         'fixed top-0 right-0 z-30 h-16 bg-background/80 backdrop-blur-md border-b border-border transition-all duration-300',
-        collapsed ? 'left-[70px]' : 'left-[260px]',
-        'left-0 lg:left-[260px]'
+        collapsed ? 'left-[70px]' : 'left-[220px]',
+        'left-0 lg:left-[220px]'
       )}
     >
       <div className="flex h-full items-center justify-between px-4 lg:px-6">
@@ -37,19 +52,19 @@ export function Navbar({ collapsed }) {
               placeholder="Search transactions, categories..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-muted/50 border-0 focus-visible:ring-1"
+              className="pl-10 bg-background/50 dark:bg-slate-900/80 border border-border/40 shadow-sm hover:shadow-md rounded-full focus-visible:ring-[#0F3D2E] dark:focus-visible:ring-[#16A34A] focus-visible:ring-1 transition-all"
             />
           </div>
         </div>
 
         {/* Right Side Actions */}
-        <div className="flex items-center gap-2 ml-auto">
+        <div className="flex items-center gap-4 ml-auto">
           {/* Theme Toggle */}
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="relative"
+            className="relative hover:bg-[#0F3D2E]/5 dark:hover:bg-[#14532D] hover:text-[#0F3D2E] dark:hover:text-emerald-50 rounded-lg transition-colors"
           >
             <Sun className={cn('h-5 w-5 transition-transform', theme === 'dark' && 'rotate-90 scale-0')} />
             <Moon className={cn('absolute h-5 w-5 transition-transform', theme === 'light' && '-rotate-90 scale-0')} />
@@ -58,7 +73,7 @@ export function Navbar({ collapsed }) {
           {/* Notifications */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative">
+              <Button variant="ghost" size="icon" className="relative hover:bg-[#0F3D2E]/5 dark:hover:bg-[#14532D] hover:text-[#0F3D2E] dark:hover:text-emerald-50 rounded-lg transition-colors">
                 <Bell className="h-5 w-5" />
                 {unreadCount > 0 && (
                   <Badge
@@ -95,30 +110,33 @@ export function Navbar({ collapsed }) {
           {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-semibold text-sm">
-                  RS
+              <Button variant="ghost" className="relative h-10 w-10 p-0 rounded-full hover:bg-[#0F3D2E]/5 dark:hover:bg-[#14532D] transition-colors focus-visible:ring-2 focus-visible:ring-[#0F3D2E] dark:focus-visible:ring-[#16A34A] focus-visible:ring-offset-2">
+                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-semibold text-sm shadow-sm ring-1 ring-border/50">
+                  {initials}
                 </div>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel className="font-normal">
+            <DropdownMenuContent align="end" className="w-56 rounded-xl shadow-lg border-border/50 p-1.5">
+              <DropdownMenuLabel className="font-normal p-2">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-semibold">Rahul Sharma</p>
-                  <p className="text-xs text-muted-foreground">rahul.sharma@email.com</p>
+                  <p className="text-sm font-semibold leading-none">{userName}</p>
+                  <p className="text-xs text-muted-foreground leading-none mt-1 truncate">{userEmail}</p>
                 </div>
               </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuSeparator className="my-1" />
+              <DropdownMenuItem className="rounded-lg cursor-pointer transition-colors focus:bg-[#0F3D2E]/5 dark:focus:bg-[#14532D] focus:text-[#0F3D2E] dark:focus:text-emerald-50 py-2 px-2.5">
                 <User className="mr-2 h-4 w-4" />
                 <span>Profile</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem className="rounded-lg cursor-pointer transition-colors focus:bg-[#0F3D2E]/5 dark:focus:bg-[#14532D] focus:text-[#0F3D2E] dark:focus:text-emerald-50 py-2 px-2.5">
                 <Settings className="mr-2 h-4 w-4" />
                 <span>Settings</span>
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive">
+              <DropdownMenuSeparator className="my-1" />
+              <DropdownMenuItem 
+                onClick={logout}
+                className="text-destructive rounded-lg cursor-pointer transition-colors focus:bg-destructive/10 focus:text-destructive py-2 px-2.5"
+              >
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
               </DropdownMenuItem>
