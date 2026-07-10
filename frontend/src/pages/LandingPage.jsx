@@ -164,8 +164,8 @@ export function LandingPage({ setCurrentPage }) {
                     className={cn(
                       'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',
                       active
-                        ? 'text-[#0F3D2E] bg-green-50'
-                        : 'text-gray-500 hover:text-[#0F3D2E] hover:bg-gray-50',
+                        ? 'text-[#0F3D2E] dark:text-white bg-green-50 dark:bg-emerald-900/50'
+                        : 'text-gray-500 hover:text-[#0F3D2E] dark:hover:text-emerald-400 hover:bg-gray-50 dark:hover:bg-slate-800',
                     )}
                   >
                     {label}
@@ -210,7 +210,7 @@ export function LandingPage({ setCurrentPage }) {
                 <a
                   key={id}
                   href={`#${id}`}
-                  className="block px-4 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-[#0F3D2E] transition-all"
+                  className="block px-4 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-[#0F3D2E] dark:hover:text-emerald-400 transition-all"
                   onClick={() => setMenuOpen(false)}
                 >
                   {label}
@@ -254,7 +254,7 @@ export function LandingPage({ setCurrentPage }) {
         </div>
 
         <div className="max-w-[1440px] mx-auto px-4 md:px-8 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-8 items-center">
 
             {/* ── Left: copy ── */}
             <div className="fp-anim-left">
@@ -343,94 +343,94 @@ export function LandingPage({ setCurrentPage }) {
             </div>
 
             {/* ── Right: floating dashboard mockup ── */}
-            <div className="relative h-[570px] hidden lg:block fp-anim-right">
+            <div className="relative h-[640px] hidden lg:block fp-anim-right -ml-12 mt-6">
 
               {/* Card 1 — Total Balance */}
               <div
-                className="fp-float-1 absolute w-64 p-6 rounded-2xl"
+                className="fp-float-1 absolute w-[290px] p-7 rounded-2xl"
                 style={{
-                  top: 0, left: 16,
+                  top: 0, left: 0,
                   '--fp-r': '-3deg',
                   background: C.primary,
                   boxShadow: '0 28px 56px rgba(15,61,46,0.30), 0 8px 16px rgba(0,0,0,0.1)',
                 }}
               >
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.12)' }}>
-                    <BarChart3 className="w-4 h-4 text-white" />
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.12)' }}>
+                    <BarChart3 className="w-5 h-5 text-white" />
                   </div>
-                  <span className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.52)' }}>Total Balance</span>
+                  <span className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.52)' }}>Total Balance</span>
                 </div>
-                <p className="text-[2rem] font-bold text-white leading-none mb-4">₹1,45,000</p>
-                <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: 'rgba(255,255,255,0.07)' }}>
-                  <ArrowUpRight className="w-4 h-4 text-emerald-400" />
-                  <span className="text-emerald-400 text-sm font-bold">+12.5%</span>
+                <p className="text-[2.35rem] font-bold text-white leading-none mb-5">₹1,45,000</p>
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl" style={{ background: 'rgba(255,255,255,0.07)' }}>
+                  <ArrowUpRight className="w-5 h-5 text-emerald-400" />
+                  <span className="text-emerald-400 text-[15px] font-bold">+12.5%</span>
                   <span className="text-xs ml-1" style={{ color: 'rgba(255,255,255,0.32)' }}>this month</span>
                 </div>
               </div>
 
               {/* Card 2 — Monthly Budget */}
               <div
-                className="fp-float-2 absolute w-[214px] p-5 rounded-2xl bg-white"
+                className="fp-float-2 absolute w-[246px] p-6 rounded-2xl bg-white"
                 style={{
-                  top: 36, right: 4,
+                  top: 20, right: 0,
                   '--fp-r': '3.5deg',
                   boxShadow: '0 20px 44px rgba(0,0,0,0.09), 0 4px 8px rgba(0,0,0,0.05)',
                 }}
               >
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#FEF3C7' }}>
-                    <PiggyBank className="w-5 h-5" style={{ color: C.amber }} />
+                <div className="flex items-center gap-3.5 mb-5">
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: '#FEF3C7' }}>
+                    <PiggyBank className="w-6 h-6" style={{ color: C.amber }} />
                   </div>
                   <div>
-                    <p className="text-[11px] text-gray-400 font-medium">Monthly Budget</p>
-                    <p className="font-bold text-base" style={{ color: C.primary }}>₹75,000</p>
+                    <p className="text-xs text-gray-400 font-medium">Monthly Budget</p>
+                    <p className="font-bold text-lg" style={{ color: C.primary }}>₹75,000</p>
                   </div>
                 </div>
-                <div className="h-2 rounded-full bg-gray-100 overflow-hidden mb-2">
+                <div className="h-2.5 rounded-full bg-gray-100 overflow-hidden mb-2.5">
                   <div className="h-full rounded-full" style={{ width: '70%', background: C.amber }} />
                 </div>
-                <p className="text-[11px] text-gray-400">70% used · ₹22,500 remaining</p>
+                <p className="text-xs text-gray-400">70% used · ₹22,500 remaining</p>
               </div>
 
               {/* Card 3 — AI Insight */}
               <div
-                className="fp-float-3 absolute w-[232px] p-5 rounded-2xl"
+                className="fp-float-3 absolute w-[266px] p-6 rounded-2xl"
                 style={{
-                  top: 232, left: 0,
+                  top: 260, left: -20,
                   '--fp-r': '-2.5deg',
                   background: 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)',
                   boxShadow: '0 24px 52px rgba(245,158,11,0.38), 0 8px 16px rgba(0,0,0,0.06)',
                 }}
               >
-                <div className="flex items-center gap-2.5 mb-3">
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.22)' }}>
-                    <Sparkles className="w-4 h-4 text-white" />
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.22)' }}>
+                    <Sparkles className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <p className="text-white font-bold text-xs">AI Insight</p>
-                    <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.62)' }}>Personalized for you</p>
+                    <p className="text-white font-bold text-sm">AI Insight</p>
+                    <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.62)' }}>Personalized for you</p>
                   </div>
                 </div>
-                <p className="text-white text-xs leading-relaxed font-medium">
+                <p className="text-white text-[13.5px] leading-relaxed font-medium">
                   Cut restaurant spending by 30% to save ₹3,500 this month 🎯
                 </p>
               </div>
 
               {/* Card 4 — Expense Trend */}
               <div
-                className="fp-float-4 absolute w-[232px] p-5 rounded-2xl bg-white"
+                className="fp-float-4 absolute w-[266px] p-6 rounded-2xl bg-white"
                 style={{
-                  bottom: 152, right: 0,
+                  bottom: 140, right: -10,
                   '--fp-r': '2deg',
                   boxShadow: '0 20px 44px rgba(0,0,0,0.09), 0 4px 8px rgba(0,0,0,0.05)',
                 }}
               >
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-sm font-semibold" style={{ color: C.primary }}>Expense Trend</p>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-400 font-medium">7 days</span>
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-base font-semibold" style={{ color: C.primary }}>Expense Trend</p>
+                  <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-500 font-medium">7 days</span>
                 </div>
-                <div className="flex items-end gap-1.5 h-[58px] mb-2">
+                <div className="flex items-end gap-2 h-[68px] mb-3">
                   {[32, 60, 44, 80, 52, 68, 48].map((h, i) => (
                     <div
                       key={i}
@@ -445,26 +445,26 @@ export function LandingPage({ setCurrentPage }) {
                 </div>
                 <div className="flex justify-between">
                   {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
-                    <span key={i} className="text-[9px] flex-1 text-center text-gray-300 font-medium">{d}</span>
+                    <span key={i} className="text-[10px] flex-1 text-center text-gray-300 font-medium">{d}</span>
                   ))}
                 </div>
               </div>
 
               {/* Card 5 — Monthly Spend */}
               <div
-                className="fp-float-5 absolute w-[178px] p-5 rounded-2xl"
+                className="fp-float-5 absolute w-[205px] p-6 rounded-2xl"
                 style={{
-                  bottom: 16, left: 28,
+                  bottom: 0, left: 20,
                   '--fp-r': '-1.2deg',
                   background: '#111827',
                   boxShadow: '0 18px 36px rgba(0,0,0,0.22)',
                 }}
               >
-                <p className="text-[11px] font-medium mb-1" style={{ color: 'rgba(255,255,255,0.42)' }}>Monthly Spend</p>
-                <p className="text-2xl font-bold text-white">₹52,848</p>
-                <div className="flex items-center gap-1 mt-2">
-                  <ArrowDownRight className="w-3.5 h-3.5 text-emerald-400" />
-                  <span className="text-emerald-400 text-xs font-semibold">-3.4%</span>
+                <p className="text-xs font-medium mb-1.5" style={{ color: 'rgba(255,255,255,0.42)' }}>Monthly Spend</p>
+                <p className="text-3xl font-bold text-white">₹52,848</p>
+                <div className="flex items-center gap-1.5 mt-3">
+                  <ArrowDownRight className="w-4 h-4 text-emerald-400" />
+                  <span className="text-emerald-400 text-sm font-semibold">-3.4%</span>
                 </div>
               </div>
             </div>
