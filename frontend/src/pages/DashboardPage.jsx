@@ -143,7 +143,7 @@ export function DashboardPage({ setCurrentPage }) {
       <div className="flex flex-col items-center justify-center h-64 space-y-4">
         <AlertCircle className="w-12 h-12 text-destructive" />
         <p className="text-destructive font-medium">{error}</p>
-        <Button onClick={fetchAll} variant="outline" className="gap-2">
+        <Button onClick={fetchAll} className="gap-2 bg-[#0F3D2E] dark:bg-[#16A34A] hover:bg-[#0F3D2E]/90 dark:hover:bg-[#14532D] text-white rounded-xl transition-all shadow-sm hover:shadow-md">
           <RefreshCw className="w-4 h-4" />
           Retry
         </Button>
@@ -154,20 +154,20 @@ export function DashboardPage({ setCurrentPage }) {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">
-            Welcome back, {user?.name || 'there'}!
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#0F3D2E] dark:text-emerald-50">Dashboard</h1>
+          <p className="text-muted-foreground mt-1">
+            Welcome back, {user?.name || 'there'}! Here's your financial overview.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="gap-2">
-            <Calendar className="w-4 h-4" />
+        <div className="flex items-center gap-3">
+          <Button variant="outline" className="gap-2 rounded-xl shadow-sm hover:shadow-md border-border/50 bg-white/50 dark:bg-card/50 hover:bg-white dark:hover:bg-card hover:text-[#0F3D2E] dark:hover:text-emerald-400 transition-all">
+            <Calendar className="w-4 h-4 text-emerald-600" />
             {displayMonth}
           </Button>
-          <Button variant="outline" size="icon" onClick={fetchAll}>
-            <RefreshCw className="w-4 h-4" />
+          <Button variant="outline" size="icon" onClick={fetchAll} className="rounded-xl shadow-sm hover:shadow-md border-border/50 bg-white/50 dark:bg-card/50 hover:bg-white dark:hover:bg-card hover:text-[#0F3D2E] dark:hover:text-emerald-400 transition-all group">
+            <RefreshCw className="w-4 h-4 text-emerald-600 group-hover:rotate-180 transition-transform duration-500" />
           </Button>
         </div>
       </div>
@@ -175,54 +175,54 @@ export function DashboardPage({ setCurrentPage }) {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Total Expenses */}
-        <Card className="overflow-hidden">
+        <Card className="rounded-xl overflow-hidden shadow-sm hover:shadow-[0_8px_30px_rgb(16,185,129,0.15)] hover:-translate-y-1.5 transition-all duration-300 border-border/50 bg-white/50 dark:bg-card/50 backdrop-blur-sm group">
           <CardContent className="p-6">
             <div className="flex items-start justify-between">
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">Total Expenses</p>
-                <p className="text-2xl sm:text-3xl font-bold">
+              <div className="space-y-1">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total Expenses</p>
+                <p className="text-4xl font-extrabold text-[#0F3D2E] dark:text-emerald-50 tracking-tight">
                   ₹{(dashboardData?.totalExpenses || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                 </p>
-                <p className="text-sm text-muted-foreground">All time</p>
+                <p className="text-xs text-muted-foreground/80 font-medium pt-1">All time</p>
               </div>
-              <div className="p-3 rounded-xl bg-rose-500/10">
-                <Receipt className="w-5 h-5 text-rose-500" />
+              <div className="p-5 rounded-2xl bg-rose-500/10 shadow-inner group-hover:scale-110 transition-transform duration-300">
+                <Receipt className="w-7 h-7 text-rose-500" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Highest Expense */}
-        <Card className="overflow-hidden">
+        <Card className="rounded-xl overflow-hidden shadow-sm hover:shadow-[0_8px_30px_rgb(16,185,129,0.15)] hover:-translate-y-1.5 transition-all duration-300 border-border/50 bg-white/50 dark:bg-card/50 backdrop-blur-sm group">
           <CardContent className="p-6">
             <div className="flex items-start justify-between">
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">Highest Expense</p>
-                <p className="text-2xl sm:text-3xl font-bold">
+              <div className="space-y-1">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Highest Expense</p>
+                <p className="text-4xl font-extrabold text-[#0F3D2E] dark:text-emerald-50 tracking-tight">
                   ₹{(dashboardData?.highestExpense || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                 </p>
-                <p className="text-sm text-muted-foreground">Single transaction</p>
+                <p className="text-xs text-muted-foreground/80 font-medium pt-1">Single transaction</p>
               </div>
-              <div className="p-3 rounded-xl bg-amber-500/10">
-                <TrendingUp className="w-5 h-5 text-amber-500" />
+              <div className="p-5 rounded-2xl bg-amber-500/10 shadow-inner group-hover:scale-110 transition-transform duration-300">
+                <TrendingUp className="w-7 h-7 text-amber-500" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Total Transactions */}
-        <Card className="overflow-hidden">
+        <Card className="rounded-xl overflow-hidden shadow-sm hover:shadow-[0_8px_30px_rgb(16,185,129,0.15)] hover:-translate-y-1.5 transition-all duration-300 border-border/50 bg-white/50 dark:bg-card/50 backdrop-blur-sm group">
           <CardContent className="p-6">
             <div className="flex items-start justify-between">
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">Total Transactions</p>
-                <p className="text-2xl sm:text-3xl font-bold">
+              <div className="space-y-1">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total Transactions</p>
+                <p className="text-4xl font-extrabold text-[#0F3D2E] dark:text-emerald-50 tracking-tight">
                   {dashboardData?.totalTransactions || 0}
                 </p>
-                <p className="text-sm text-muted-foreground">All time</p>
+                <p className="text-xs text-muted-foreground/80 font-medium pt-1">All time</p>
               </div>
-              <div className="p-3 rounded-xl bg-emerald-500/10">
-                <Wallet className="w-5 h-5 text-emerald-500" />
+              <div className="p-5 rounded-2xl bg-emerald-500/10 shadow-inner group-hover:scale-110 transition-transform duration-300">
+                <Wallet className="w-7 h-7 text-emerald-500" />
               </div>
             </div>
           </CardContent>
@@ -232,26 +232,26 @@ export function DashboardPage({ setCurrentPage }) {
       {/* Monthly Summary Cards */}
       {monthlyData && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <Card className="border-emerald-500/20 bg-emerald-500/5">
-            <CardContent className="p-4">
-              <p className="text-sm text-muted-foreground">Monthly Expenses</p>
-              <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
+          <Card className="rounded-xl border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10 transition-colors shadow-sm">
+            <CardContent className="p-5">
+              <p className="text-sm font-medium text-emerald-800/70 dark:text-emerald-400/70 uppercase tracking-wider mb-1">Monthly Expenses</p>
+              <p className="text-2xl font-bold text-[#0F3D2E] dark:text-emerald-300">
                 ₹{(monthlyData.totalExpenses || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </p>
             </CardContent>
           </Card>
-          <Card className="border-cyan-500/20 bg-cyan-500/5">
-            <CardContent className="p-4">
-              <p className="text-sm text-muted-foreground">Monthly Transactions</p>
-              <p className="text-xl font-bold text-cyan-600 dark:text-cyan-400">
+          <Card className="rounded-xl border-cyan-500/20 bg-cyan-500/5 hover:bg-cyan-500/10 transition-colors shadow-sm">
+            <CardContent className="p-5">
+              <p className="text-sm font-medium text-cyan-800/70 dark:text-cyan-400/70 uppercase tracking-wider mb-1">Monthly Transactions</p>
+              <p className="text-2xl font-bold text-[#0F3D2E] dark:text-cyan-300">
                 {monthlyData.totalTransactions || 0}
               </p>
             </CardContent>
           </Card>
-          <Card className="border-violet-500/20 bg-violet-500/5">
-            <CardContent className="p-4">
-              <p className="text-sm text-muted-foreground">Highest This Month</p>
-              <p className="text-xl font-bold text-violet-600 dark:text-violet-400">
+          <Card className="rounded-xl border-violet-500/20 bg-violet-500/5 hover:bg-violet-500/10 transition-colors shadow-sm">
+            <CardContent className="p-5">
+              <p className="text-sm font-medium text-violet-800/70 dark:text-violet-400/70 uppercase tracking-wider mb-1">Highest This Month</p>
+              <p className="text-2xl font-bold text-[#0F3D2E] dark:text-violet-300">
                 ₹{(monthlyData.highestExpense || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </p>
             </CardContent>
@@ -262,15 +262,17 @@ export function DashboardPage({ setCurrentPage }) {
       {/* Charts Grid */}
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Category Pie Chart */}
-        <Card className="lg:col-span-1">
+        <Card className="lg:col-span-1 rounded-xl shadow-sm border-border/50">
           <CardHeader>
             <CardTitle>Expense by Category</CardTitle>
             <CardDescription>Where your money goes</CardDescription>
           </CardHeader>
           <CardContent>
             {categoryExpenses.length === 0 ? (
-              <div className="h-[250px] flex items-center justify-center text-muted-foreground text-sm">
-                No expense data yet
+              <div className="h-[250px] flex flex-col items-center justify-center text-muted-foreground text-sm bg-emerald-50/30 dark:bg-emerald-900/10 rounded-xl border border-dashed border-emerald-500/20">
+                <Target className="w-12 h-12 mb-3 text-emerald-500/40" />
+                <p className="font-semibold text-foreground text-base">No expenses yet</p>
+                <p className="text-muted-foreground mt-1 text-center max-w-[220px]">Add your first expense to start tracking.</p>
               </div>
             ) : (
               <>
@@ -315,13 +317,13 @@ export function DashboardPage({ setCurrentPage }) {
         </Card>
 
         {/* Recent Expenses */}
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 rounded-xl shadow-sm border-border/50">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle>Recent Expenses</CardTitle>
               <CardDescription>Your latest financial activities</CardDescription>
             </div>
-            <Button variant="ghost" size="sm" onClick={() => setCurrentPage && setCurrentPage('/expenses')}>
+            <Button variant="ghost" size="sm" onClick={() => setCurrentPage && setCurrentPage('/expenses')} className="text-[#0F3D2E] dark:text-emerald-400 hover:text-[#0F3D2E] dark:hover:text-emerald-300 hover:bg-[#0F3D2E]/5 dark:hover:bg-[#14532D] rounded-lg transition-colors">
               View All
             </Button>
           </CardHeader>
@@ -329,9 +331,10 @@ export function DashboardPage({ setCurrentPage }) {
             <ScrollArea className="h-[300px]">
               <div className="space-y-3">
                 {recentExpenses.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-40 text-muted-foreground text-sm">
-                    <Receipt className="w-8 h-8 mb-2 opacity-40" />
-                    No expenses yet. Add your first expense!
+                  <div className="flex flex-col items-center justify-center h-40 text-muted-foreground text-sm bg-emerald-50/30 dark:bg-emerald-900/10 rounded-xl border border-dashed border-emerald-500/20 mt-2">
+                    <Receipt className="w-12 h-12 mb-3 text-emerald-500/40" />
+                    <p className="font-semibold text-foreground text-base">No expenses yet</p>
+                    <p className="text-muted-foreground mt-1 text-center max-w-[220px]">Add your first expense to start tracking.</p>
                   </div>
                 ) : (
                   recentExpenses.map((expense) => (
@@ -366,7 +369,7 @@ export function DashboardPage({ setCurrentPage }) {
 
       {/* Budget Progress */}
       {budgetSummary.length > 0 && (
-        <Card>
+        <Card className="rounded-xl shadow-sm border-border/50">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
