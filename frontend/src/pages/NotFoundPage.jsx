@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Home, ArrowLeft, Search, Sparkles } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils/utils';
 
 export function NotFoundPage({ setCurrentPage }) {
   return (

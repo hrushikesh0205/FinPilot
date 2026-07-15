@@ -21,8 +21,8 @@ import {
   Send,
   Check,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { faqs } from '@/data/mockData';
+import { cn } from '@/utils/utils';
+import { faqs } from '@/constants/appData';
 
 const helpCategories = [
   { name: 'Getting Started', icon: HelpCircle, count: 12 },
