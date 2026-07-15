@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Sidebar } from './Sidebar';
 import { Navbar } from './Navbar';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils/utils';
 
 export function AppLayout({ children, currentPage, setCurrentPage }) {
   const [collapsed, setCollapsed] = useState(false);
