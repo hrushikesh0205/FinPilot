@@ -30,11 +30,11 @@ import {
   RefreshCw,
   Loader2,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils/utils';
 import { useAuth } from '@/context/AuthContext';
-import { getDashboard, getMonthlySummary } from '@/api/dashboardApi';
-import { getAllExpenses } from '@/api/expenseApi';
-import { getBudgetSummary } from '@/api/budgetApi';
+import { getDashboard, getMonthlySummary } from '@/services/dashboardApi';
+import { getAllExpenses } from '@/services/expenseApi';
+import { getBudgetSummary } from '@/services/budgetApi';
 
 const CATEGORY_COLORS = [
   '#f97316', '#06b6d4', '#ec4899', '#8b5cf6',
