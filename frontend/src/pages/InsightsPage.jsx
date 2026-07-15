@@ -19,8 +19,8 @@ import {
   Target,
   Loader2,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { aiInsights, budgets, categoryExpenses, monthlyData } from '@/data/mockData';
+import { cn } from '@/utils/utils';
+import { aiInsights, budgets, categoryExpenses, monthlyData } from '@/constants/appData';
 import {
   LineChart,
   Line,
