@@ -53,14 +53,14 @@ import {
   Loader2,
   RefreshCw,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils/utils';
 import {
   getAllBudgets,
   createBudget,
   updateBudget,
   deleteBudget,
   getBudgetSummary,
-} from '@/api/budgetApi';
+} from '@/services/budgetApi';
 
 const CATEGORIES = [
   'Food', 'Travel', 'Shopping', 'Entertainment',
