@@ -1,155 +1,214 @@
-# 💰 FinPilot
+# 💰 FinPilot – AI Personal Finance Manager
 
-FinPilot is a full-stack AI-powered personal finance management application that helps users track expenses, manage budgets, and gain intelligent financial insights. It provides secure authentication using JWT and is being developed with a scalable Spring Boot backend and a modern React frontend.
+FinPilot is a full-stack AI-powered Personal Finance Management application that helps users manage expenses, budgets, accounts, and financial reports from one place. It includes AI-powered receipt scanning, intelligent spending insights, secure JWT authentication, and an intuitive dashboard for tracking personal finances.
 
 ---
 
 ## 🚀 Features
 
-### ✅ Authentication
-- User Registration
-- Secure Login
-- JWT Authentication
+### 🔐 Secure Authentication
+- User Registration & Login
+- JWT-based Authentication
+- Spring Security
 - BCrypt Password Encryption
-- Stateless Authentication
-- Protected APIs using Spring Security
+- Protected REST APIs
+- User Profile Management
 
-### 📊 Expense Management *(In Progress)*
-- Add Expense
-- Update Expense
-- Delete Expense
-- View All Expenses
-- Expense Categories
+### 💸 Expense Management
+- Add, Edit & Delete Expenses
+- Expense Categorization
 - Monthly Expense Tracking
+- Filter & Search Expenses
+- Real-time Dashboard Updates
 
-### 🤖 AI Features *(Planned)*
-- AI Financial Assistant
-- Smart Spending Analysis
-- Budget Suggestions
-- Personalized Financial Insights
-- Expense Prediction
+### 💳 Account Management
+- Create Multiple Accounts
+- Edit & Delete Accounts
+- Default Account Selection
+- Balance Management
 
-### 📈 Dashboard *(Planned)*
-- Monthly Expense Charts
-- Category-wise Analysis
-- Budget Progress
-- Spending Trends
+### 📊 Budget Management
+- Create Monthly Budgets
+- Budget Progress Tracking
+- Overspending Alerts
+- Category-wise Budget Monitoring
+
+### 🧾 AI Receipt Scanner
+- Upload Receipt Images
+- AI-powered OCR Data Extraction
+- Auto-fill Expense Details
+- Save Scanned Expenses Directly
+
+### 🤖 AI Financial Insights
+- Spending Pattern Analysis
+- Personalized Financial Suggestions
+- Budget Recommendations
+- Smart Expense Insights
+
+### 📈 Reports & Analytics
+- Monthly Financial Reports
+- Income vs Expense Analysis
+- Category-wise Charts
+- Export Reports (PDF / Excel)
+
+### 🔔 Smart Notifications
+- Expense Notifications
+- Budget Alerts
+- AI Insight Notifications
+- Financial Activity Updates
+
+### 👤 User Profile
+- Edit Profile
+- Upload Profile Picture
+- Change Password
+- Secure Account Management
 
 ---
 
-## 🛠 Tech Stack
+# 🛠 Tech Stack
 
-### Backend
+## Backend
 - Java 21
 - Spring Boot 3
 - Spring Security
 - Spring Data JPA
 - Hibernate
 - JWT Authentication
-- BCrypt Password Encoder
 - Maven
 
-### Database
-- MySQL
-
-### Frontend *(Upcoming)*
+## Frontend
 - React.js
+- JavaScript (JSX)
 - Tailwind CSS
 - Axios
+- React Router
 - Chart.js
 
-### AI *(Upcoming)*
-- OpenAI API / Gemini API / Openrouter
+## Database
+- MySQL
+
+## AI Integration
+- OCR-based Receipt Scanner
+- AI Financial Insights
+- AI-powered Spending Analysis
 
 ---
 
-## 📂 Project Structure
+# 📂 Project Structure
 
 ```
-backend
+FinPilot
 │
-├── config
-├── controller
-├── dto
-├── entity
-├── repository
-├── security
-├── service
-├── util
-└── resources
+├── backend
+│   ├── config
+│   ├── controller
+│   ├── dto
+│   ├── entity
+│   ├── repository
+│   ├── security
+│   ├── service
+│   ├── util
+│   └── resources
+│
+├── frontend
+│   ├── api
+│   ├── components
+│   ├── context
+│   ├── pages
+│   ├── assets
+│   └── styles
+│
+└── README.md
 ```
 
 ---
 
-## 🔐 Authentication Flow
+---
 
-```
-User Login
-      │
-      ▼
-AuthController
-      │
-      ▼
-UserService
-      │
-      ▼
-Verify Password (BCrypt)
-      │
-      ▼
-Generate JWT
-      │
-      ▼
-Return Token
-      │
-      ▼
-Frontend Stores Token
-      │
-      ▼
-Bearer Token
-      │
-      ▼
-JwtFilter
-      │
-      ▼
-Validate Token
-      │
-      ▼
-Access Protected APIs
-```
+# 📌 REST APIs
+
+## Authentication
+
+| Method | Endpoint |
+|---------|----------|
+| POST | /auth/register |
+| POST | /auth/login |
+
+## Expenses
+
+| Method | Endpoint |
+|---------|----------|
+| GET | /expenses |
+| POST | /expenses |
+| PUT | /expenses/{id} |
+| DELETE | /expenses/{id} |
+
+## Categories
+
+| Method | Endpoint |
+|---------|----------|
+| GET | /categories |
+| POST | /categories |
+
+## Accounts
+
+| Method | Endpoint |
+|---------|----------|
+| GET | /accounts |
+| POST | /accounts |
+
+## Budgets
+
+| Method | Endpoint |
+|---------|----------|
+| GET | /budgets |
+| POST | /budgets |
 
 ---
 
-## 📌 REST APIs
+# ▶️ Getting Started
 
-### Authentication
-
-| Method | Endpoint | Description |
-|---------|----------|-------------|
-| POST | `/auth/register` | Register a new user |
-| POST | `/auth/login` | Login and receive JWT Token |
-
----
-
-## ▶️ Getting Started
-
-### Clone Repository
+## Clone Repository
 
 ```bash
 git clone https://github.com/hrushikesh0205/FinPilot.git
 ```
 
-### Navigate to Backend
+## Backend
 
 ```bash
-cd FinPilot/backend
+cd backend
+mvn spring-boot:run
 ```
 
-### Configure Database
-
-Update the following properties inside:
+Runs on:
 
 ```
-src/main/resources/application.properties
+http://localhost:8080
+```
+
+## Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Runs on:
+
+```
+http://localhost:5173
+```
+
+---
+
+# 🗄 Database Configuration
+
+Configure your MySQL database in:
+
+```
+backend/src/main/resources/application.properties
 ```
 
 ```properties
@@ -158,76 +217,44 @@ spring.datasource.username=YOUR_USERNAME
 spring.datasource.password=YOUR_PASSWORD
 ```
 
-### Run the Project
+---
 
-```bash
-mvn spring-boot:run
-```
+# 📸 Screenshots
 
-Server starts at
+Add screenshots here:
 
-```
-http://localhost:8080
-```
+- Landing Page
+- Dashboard
+- Expense Management
+- AI Receipt Scanner
+- Reports
+- AI Insights
 
 ---
 
-## 🧪 Testing APIs
+# 🚀 Future Enhancements
 
-Use **Postman** to test:
-
-### Register
-
-```
-POST /auth/register
-```
-
-### Login
-
-```
-POST /auth/login
-```
-
-The login endpoint returns a JWT token which is used to access protected APIs.
+- Voice-based Expense Entry
+- AI Chat Financial Assistant
+- Expense Prediction using AI
+- Smart Saving Goals
+- Bank API Integration
+- Mobile Application
 
 ---
 
-## 📅 Development Status
-
-- ✅ User Registration
-- ✅ Password Encryption (BCrypt)
-- ✅ JWT Authentication
-- ✅ Spring Security Configuration
-- ✅ Login API
-- 🔄 Expense CRUD
-- 🔄 Dashboard APIs
-- 🔄 AI Integration
-- 🔄 React Frontend
-- 🔄 Deployment
-
----
-
-## 🎯 Future Enhancements
-
-- AI Expense Categorization
-- Smart Budget Recommendations
-- Email Notifications
-- Export Reports (PDF/Excel)
-- Multi-Currency Support
-- Dark Mode
-- Mobile Responsive UI
-
----
-
-## 👨‍💻 Developer
+# 👨‍💻 Developer
 
 **Hrushikesh Bhoir**
 
-- GitHub: https://github.com/hrushikesh0205
-- LinkedIn: *https://www.linkedin.com/in/hrushikesh-bhoir/*
+GitHub:
+https://github.com/hrushikesh0205
+
+LinkedIn:
+https://www.linkedin.com/in/hrushikesh-bhoir/
 
 ---
 
-## ⭐ Support
+# ⭐ Show Your Support
 
-If you found this project helpful, consider giving it a ⭐ on GitHub.
+If you found this project useful, don't forget to ⭐ the repository.
