@@ -74,7 +74,7 @@ import {
   CreditCard,
   WalletCards
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils/utils';
 import { format, isSameMonth, parseISO } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -84,7 +84,7 @@ import {
   searchExpenses,
   getExpensesByCategory,
   getSortedExpenses,
-} from '@/api/expenseApi';
+} from '@/services/expenseApi';
 
 const CATEGORIES = [
   'Food', 'Travel', 'Shopping', 'Entertainment',
