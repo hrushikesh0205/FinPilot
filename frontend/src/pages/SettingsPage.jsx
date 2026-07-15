@@ -1,85 +1,146 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import {
   Sun,
   Moon,
-  Bell,
-  Shield,
-  Globe,
   Palette,
-  Trash2,
-  Download,
-  AlertCircle,
+  User,
+  Lock,
+  Loader2,
   Check,
+  Info,
+  Code2,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils/utils';
 import { useTheme } from '@/context/ThemeContext';
-
-const currencies = [
-  { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
-  { code: 'USD', symbol: '$', name: 'US Dollar' },
-  { code: 'EUR', symbol: '€', name: 'Euro' },
-  { code: 'GBP', symbol: '£', name: 'British Pound' },
-];
+import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { getProfile, updateProfileDetails, changePassword } from '@/services/authApi';
 
 export function SettingsPage() {
   const { theme, setTheme } = useTheme();
-  const [currency, setCurrency] = useState('INR');
-  const [notifications, setNotifications] = useState({
-    email: true,
-    push: true,
-    budget: true,
-    billReminders: true,
-    aiInsights: true,
-    weeklyReports: false,
-  });
+  const { user, login }     = useAuth();
+  const { toast }           = useToast();
+
+  // ── Profile state ────────────────────────────────────────────────────────
+  const [name, setName]             = useState(user?.name || '');
+  const [email, setEmail]           = useState(user?.email || '');
+  const [isSavingName, setIsSavingName] = useState(false);
+
+  // ── Password state ───────────────────────────────────────────────────────
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword]         = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showCurrent, setShowCurrent]         = useState(false);
+  const [showNew, setShowNew]                 = useState(false);
+  const [showConfirm, setShowConfirm]         = useState(false);
+  const [isSavingPassword, setIsSavingPassword] = useState(false);
+
+  // Load real profile from backend on mount
+  useEffect(() => {
+    getProfile()
+      .then((res) => {
+        setName(res.data.name || '');
+        setEmail(res.data.email || '');
+      })
+      .catch(() => {
+        // Fallback to JWT-decoded data already in AuthContext
+        setName(user?.name || '');
+        setEmail(user?.email || '');
+      });
+  }, []);
+
+  // ── Save name ─────────────────────────────────────────────────────────────
+  const handleSaveName = async () => {
+    if (!name.trim()) {
+      toast({ title: 'Validation error', description: 'Name cannot be empty.', variant: 'destructive' });
+      return;
+    }
+    try {
+      setIsSavingName(true);
+      await updateProfileDetails(name.trim(), null);
+      // Update localStorage so Navbar reflects the new name immediately
+      const stored = JSON.parse(localStorage.getItem('user') || '{}');
+      localStorage.setItem('user', JSON.stringify({ ...stored, name: name.trim() }));
+      toast({ title: 'Profile updated', description: 'Your name has been saved.' });
+    } catch (err) {
+      toast({
+        title: 'Error',
+        description: err?.response?.data?.message || 'Could not update profile.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSavingName(false);
+    }
+  };
+
+  // ── Change password ───────────────────────────────────────────────────────
+  const handleChangePassword = async () => {
+    if (!currentPassword) {
+      toast({ title: 'Validation error', description: 'Please enter your current password.', variant: 'destructive' });
+      return;
+    }
+    if (newPassword.length < 6) {
+      toast({ title: 'Validation error', description: 'New password must be at least 6 characters.', variant: 'destructive' });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast({ title: 'Validation error', description: 'New passwords do not match.', variant: 'destructive' });
+      return;
+    }
+    try {
+      setIsSavingPassword(true);
+      await changePassword(currentPassword, newPassword);
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      toast({ title: 'Password changed', description: 'Your password has been updated successfully.' });
+    } catch (err) {
+      toast({
+        title: 'Error',
+        description: err?.response?.data?.message || 'Could not change password.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSavingPassword(false);
+    }
+  };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="space-y-6 max-w-2xl mx-auto">
+
       {/* Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold">Settings</h1>
-        <p className="text-muted-foreground">
-          Manage your application preferences
-        </p>
+        <p className="text-muted-foreground">Manage your account and application preferences</p>
       </div>
 
-      {/* Theme Settings */}
+      {/* ── 1. APPEARANCE ─────────────────────────────────────────────────── */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Palette className="w-5 h-5" />
+            <Palette className="w-5 h-5 text-emerald-500" />
             Appearance
           </CardTitle>
-          <CardDescription>
-            Customize the look and feel of the application
-          </CardDescription>
+          <CardDescription>Choose how FinPilot looks to you</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent>
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">Theme</p>
-              <p className="text-sm text-muted-foreground">
-                Choose between light and dark mode
-              </p>
+              <p className="text-sm text-muted-foreground">Switch between Light and Dark mode</p>
             </div>
             <div className="flex gap-2">
               <Button
                 variant={theme === 'light' ? 'default' : 'outline'}
                 size="sm"
-                className="gap-2"
+                className={cn('gap-2', theme === 'light' && 'bg-gradient-to-r from-emerald-500 to-teal-600')}
                 onClick={() => setTheme('light')}
               >
                 <Sun className="w-4 h-4" />
@@ -88,7 +149,7 @@ export function SettingsPage() {
               <Button
                 variant={theme === 'dark' ? 'default' : 'outline'}
                 size="sm"
-                className="gap-2"
+                className={cn('gap-2', theme === 'dark' && 'bg-gradient-to-r from-emerald-500 to-teal-600')}
                 onClick={() => setTheme('dark')}
               >
                 <Moon className="w-4 h-4" />
@@ -99,178 +160,203 @@ export function SettingsPage() {
         </CardContent>
       </Card>
 
-      {/* Currency Settings */}
+      {/* ── 2. USER PROFILE ───────────────────────────────────────────────── */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Globe className="w-5 h-5" />
-            Localisation
+            <User className="w-5 h-5 text-emerald-500" />
+            User Profile
           </CardTitle>
-          <CardDescription>
-            Set your preferred currency and locale settings
-          </CardDescription>
+          <CardDescription>Update your personal information</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">Currency</p>
-              <p className="text-sm text-muted-foreground">
-                Display amounts in your preferred currency
-              </p>
-            </div>
-            <Select value={currency} onValueChange={setCurrency}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {currencies.map((curr) => (
-                  <SelectItem key={curr.code} value={curr.code}>
-                    {curr.symbol} {curr.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
+        <CardContent className="space-y-5">
 
-      {/* Notification Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Bell className="w-5 h-5" />
-            Notifications
-          </CardTitle>
-          <CardDescription>
-            Configure how you receive notifications
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-4">
-            {[
-              { key: 'email', label: 'Email Notifications', desc: 'Receive updates via email' },
-              { key: 'push', label: 'Push Notifications', desc: 'Get instant updates on your device' },
-              { key: 'budget', label: 'Budget Alerts', desc: 'Get notified when approaching budget limits' },
-              { key: 'billReminders', label: 'Bill Reminders', desc: 'Receive reminders for upcoming bills' },
-              { key: 'aiInsights', label: 'AI Insights', desc: 'Get notified about new insights' },
-              { key: 'weeklyReports', label: 'Weekly Reports', desc: 'Receive weekly financial summaries' },
-            ].map((setting) => (
-              <div key={setting.key} className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">{setting.label}</p>
-                  <p className="text-sm text-muted-foreground">{setting.desc}</p>
+          {/* Name + Email */}
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="settings-name">Full Name</Label>
+              <Input
+                id="settings-name"
+                placeholder="Your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="settings-email">Email Address</Label>
+              <Input
+                id="settings-email"
+                value={email}
+                disabled
+                className="opacity-60 cursor-not-allowed"
+              />
+              <p className="text-xs text-muted-foreground">Email cannot be changed</p>
+            </div>
+          </div>
+
+          <div className="flex justify-end">
+            <Button
+              className="gap-2 bg-gradient-to-r from-emerald-500 to-teal-600"
+              onClick={handleSaveName}
+              disabled={isSavingName}
+            >
+              {isSavingName ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Check className="w-4 h-4" />
+              )}
+              Save Name
+            </Button>
+          </div>
+
+          <Separator />
+
+          {/* Change Password */}
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 mb-3">
+              <Lock className="w-4 h-4 text-muted-foreground" />
+              <p className="font-medium">Change Password</p>
+            </div>
+
+            <div className="space-y-3">
+              {/* Current Password */}
+              <div className="space-y-2">
+                <Label htmlFor="current-password">Current Password</Label>
+                <div className="relative">
+                  <Input
+                    id="current-password"
+                    type={showCurrent ? 'text' : 'password'}
+                    placeholder="Enter current password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    onClick={() => setShowCurrent((v) => !v)}
+                  >
+                    {showCurrent ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
-                <Switch
-                  checked={notifications[setting.key]}
-                  onCheckedChange={(checked) =>
-                    setNotifications({ ...notifications, [setting.key]: checked })
-                  }
-                />
               </div>
-            ))}
+
+              {/* New Password */}
+              <div className="space-y-2">
+                <Label htmlFor="new-password">New Password</Label>
+                <div className="relative">
+                  <Input
+                    id="new-password"
+                    type={showNew ? 'text' : 'password'}
+                    placeholder="Min. 6 characters"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    onClick={() => setShowNew((v) => !v)}
+                  >
+                    {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Confirm Password */}
+              <div className="space-y-2">
+                <Label htmlFor="confirm-password">Confirm New Password</Label>
+                <div className="relative">
+                  <Input
+                    id="confirm-password"
+                    type={showConfirm ? 'text' : 'password'}
+                    placeholder="Repeat new password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className={cn(
+                      'pr-10',
+                      confirmPassword && confirmPassword !== newPassword
+                        ? 'border-rose-400 focus-visible:ring-rose-400'
+                        : ''
+                    )}
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    onClick={() => setShowConfirm((v) => !v)}
+                  >
+                    {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                {confirmPassword && confirmPassword !== newPassword && (
+                  <p className="text-xs text-rose-500">Passwords do not match</p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <Button
+                className="gap-2 bg-gradient-to-r from-emerald-500 to-teal-600"
+                onClick={handleChangePassword}
+                disabled={isSavingPassword}
+              >
+                {isSavingPassword ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Lock className="w-4 h-4" />
+                )}
+                Update Password
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Security Settings */}
-      <Card>
+      {/* ── 3. ABOUT FINPILOT ─────────────────────────────────────────────── */}
+      <Card className="bg-gradient-to-br from-emerald-500/5 to-teal-500/5 border-emerald-500/20">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Shield className="w-5 h-5" />
-            Security
+            <Info className="w-5 h-5 text-emerald-500" />
+            About FinPilot
           </CardTitle>
-          <CardDescription>
-            Manage your account security settings
-          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">Two-Factor Authentication</p>
-              <p className="text-sm text-muted-foreground">
-                Add an extra layer of security to your account
-              </p>
+        <CardContent className="space-y-4">
+          <div className="grid sm:grid-cols-3 gap-4">
+            <div className="p-4 rounded-xl bg-background/60 border border-border">
+              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Version</p>
+              <p className="font-semibold">1.0.0</p>
             </div>
-            <Button variant="outline">Enable</Button>
+            <div className="p-4 rounded-xl bg-background/60 border border-border">
+              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Currency</p>
+              <p className="font-semibold">₹ INR (India)</p>
+            </div>
+            <div className="p-4 rounded-xl bg-background/60 border border-border">
+              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Stack</p>
+              <p className="font-semibold">React + Spring Boot</p>
+            </div>
           </div>
+
           <Separator />
-          <div className="flex items-center justify-between">
+
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
+              <Code2 className="w-5 h-5 text-emerald-500" />
+            </div>
             <div>
-              <p className="font-medium">Session Management</p>
-              <p className="text-sm text-muted-foreground">
-                View and manage your active sessions
+              <p className="font-medium">FinPilot</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                A full-stack personal finance management application built as a student placement
+                project. Track expenses, manage budgets, scan receipts, and view financial
+                reports — all in one place.
+              </p>
+              <p className="text-xs text-muted-foreground mt-2">
+                Built with React 18, Spring Boot 3, MySQL · Designed with Radix UI &amp; Tailwind CSS
               </p>
             </div>
-            <Button variant="outline">Manage</Button>
-          </div>
-          <Separator />
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">Login History</p>
-              <p className="text-sm text-muted-foreground">
-                View recent login activity
-              </p>
-            </div>
-            <Button variant="outline">View</Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Data Management */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Download className="w-5 h-5" />
-            Data Management
-          </CardTitle>
-          <CardDescription>
-            Export or delete your account data
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
-            <div>
-              <p className="font-medium">Export Data</p>
-              <p className="text-sm text-muted-foreground">
-                Download all your financial data
-              </p>
-            </div>
-            <Button variant="outline" className="gap-2">
-              <Download className="w-4 h-4" />
-              Export
-            </Button>
-          </div>
-          <div className="flex items-center justify-between p-4 rounded-lg bg-rose-500/10 border border-rose-500/20">
-            <div>
-              <p className="font-medium text-rose-600 dark:text-rose-400">
-                Delete Account
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Permanently delete your account and all data
-              </p>
-            </div>
-            <Button variant="destructive" className="gap-2">
-              <Trash2 className="w-4 h-4" />
-              Delete
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* App Info */}
-      <Card className="bg-muted/30">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-semibold">ExpenseIQ</p>
-              <p className="text-sm text-muted-foreground">Version 1.0.0</p>
-            </div>
-            <Button variant="outline" size="sm">
-              Check for Updates
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
