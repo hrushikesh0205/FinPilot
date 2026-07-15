@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { loginUser, registerUser } from '@/api/authApi';
+import { loginUser, registerUser } from '@/services/authApi';
 
 const AuthContext = createContext(null);
 
@@ -108,8 +108,14 @@ export function AuthProvider({ children, onLogout }) {
     if (onLogout) onLogout();
   };
 
+  const updateUser = (newUserData) => {
+    const updatedUser = { ...user, ...newUserData };
+    setUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+  };
+
   return (
-    <AuthContext.Provider value={{ token, user, loading, error, login, register, logout }}>
+    <AuthContext.Provider value={{ token, user, loading, error, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

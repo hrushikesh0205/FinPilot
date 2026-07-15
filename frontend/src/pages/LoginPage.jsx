@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sparkles, Eye, EyeOff, Mail, Lock, ArrowLeft, AlertCircle, Loader2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils/utils';
 import { useAuth } from '@/context/AuthContext';
 
 export function LoginPage({ setCurrentPage }) {
@@ -64,11 +64,7 @@ export function LoginPage({ setCurrentPage }) {
         <Card className="w-full max-w-md border-0 shadow-2xl bg-white dark:bg-card rounded-xl">
           <CardHeader className="space-y-1 text-center pb-6">
             <div className="flex justify-center mb-4">
-              <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br from-[#0F3D2E] to-[#1e5c40] dark:from-emerald-500 dark:to-emerald-600 shadow-[0_2px_10px_rgba(15,61,46,0.28)] dark:shadow-[0_2px_10px_rgba(22,163,74,0.28)]"
-              >
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
+              <img src="/logo.svg" alt="FinPilot Logo" className="w-12 h-12 object-contain shadow-[0_2px_10px_rgba(15,61,46,0.28)] rounded-[13px]" />
             </div>
             <CardTitle className="text-2xl font-bold tracking-tight text-[#0F3D2E] dark:text-white">Welcome back</CardTitle>
             <CardDescription className="text-gray-500 text-sm">
