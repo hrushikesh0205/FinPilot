@@ -1,9 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import {
   Dialog,
@@ -35,10 +34,16 @@ import {
   Heart,
   GraduationCap,
   TrendingUp,
-  MoreHorizontal,
+  Loader2,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { categories, budgets } from '@/data/mockData';
+import { cn } from '@/utils/utils';
+import { useToast } from '@/hooks/use-toast';
+import {
+  getAllCategories,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+} from '@/services/categoryApi';
 
 const iconMap = {
   UtensilsCrossed,
@@ -63,11 +68,16 @@ const colorOptions = [
 ];
 
 export function CategoriesPage() {
-  const [categoryList, setCategoryList] = useState(categories);
+  const { toast } = useToast();
+
+  const [categoryList, setCategoryList] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [newCategory, setNewCategory] = useState({
     name: '',
     icon: 'Receipt',
@@ -75,39 +85,124 @@ export function CategoriesPage() {
     budget: 0,
   });
 
-  const handleAddCategory = () => {
-    const category = {
-      id: Date.now(),
-      name: newCategory.name,
-      icon: newCategory.icon,
-      color: newCategory.color,
-      budget: newCategory.budget,
-    };
-    setCategoryList([...categoryList, category]);
-    setIsAddOpen(false);
-    setNewCategory({ name: '', icon: 'Receipt', color: '#10b981', budget: 0 });
+  // ── Load categories from backend ──────────────────────────────────────
+  const fetchCategories = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await getAllCategories();
+      setCategoryList(res.data);
+    } catch (err) {
+      console.error('Failed to load categories:', err);
+      toast({
+        title: 'Error',
+        description: 'Failed to load categories. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+  // ── Add Category ──────────────────────────────────────────────────────
+  const handleAddCategory = async () => {
+    if (!newCategory.name.trim()) {
+      toast({
+        title: 'Validation Error',
+        description: 'Category name is required.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    try {
+      setIsSaving(true);
+      await createCategory({
+        name: newCategory.name,
+        icon: newCategory.icon,
+        color: newCategory.color,
+        budget: newCategory.budget,
+      });
+      toast({ title: 'Success', description: 'Category added successfully.' });
+      setIsAddOpen(false);
+      setNewCategory({ name: '', icon: 'Receipt', color: '#10b981', budget: 0 });
+      await fetchCategories();
+    } catch (err) {
+      console.error('Failed to add category:', err);
+      toast({
+        title: 'Error',
+        description: 'Failed to add category. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleEditCategory = () => {
-    setCategoryList(
-      categoryList.map((c) =>
-        c.id === selectedCategory.id ? selectedCategory : c
-      )
-    );
-    setIsEditOpen(false);
-    setSelectedCategory(null);
+  // ── Edit Category ─────────────────────────────────────────────────────
+  const handleEditCategory = async () => {
+    if (!selectedCategory?.name?.trim()) {
+      toast({
+        title: 'Validation Error',
+        description: 'Category name is required.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    try {
+      setIsSaving(true);
+      await updateCategory(selectedCategory.id, {
+        name: selectedCategory.name,
+        icon: selectedCategory.icon,
+        color: selectedCategory.color,
+        budget: selectedCategory.budget,
+      });
+      toast({ title: 'Success', description: 'Category updated successfully.' });
+      setIsEditOpen(false);
+      setSelectedCategory(null);
+      await fetchCategories();
+    } catch (err) {
+      console.error('Failed to update category:', err);
+      toast({
+        title: 'Error',
+        description: 'Failed to update category. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleDeleteCategory = () => {
-    setCategoryList(categoryList.filter((c) => c.id !== selectedCategory.id));
-    setIsDeleteOpen(false);
-    setSelectedCategory(null);
+  // ── Delete Category ───────────────────────────────────────────────────
+  const handleDeleteCategory = async () => {
+    if (!selectedCategory) return;
+    try {
+      setIsDeleting(true);
+      await deleteCategory(selectedCategory.id);
+      toast({
+        title: 'Category deleted successfully.',
+        description: `"${selectedCategory.name}" has been permanently removed.`,
+      });
+      setIsDeleteOpen(false);
+      setSelectedCategory(null);
+      await fetchCategories();
+    } catch (err) {
+      console.error('Failed to delete category:', err);
+      toast({
+        title: 'Error',
+        description:
+          err?.response?.data?.message ||
+          'Failed to delete category. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
-  const getTotalSpent = (categoryName) => {
-    const budget = budgets.categories.find((c) => c.category === categoryName);
-    return budget ? budget.spent : 0;
-  };
+  const totalBudget = categoryList.reduce((sum, c) => sum + (c.budget || 0), 0);
 
   return (
     <div className="space-y-6">
@@ -135,7 +230,7 @@ export function CategoriesPage() {
             <div>
               <p className="text-sm text-muted-foreground">Total Monthly Budget</p>
               <p className="text-3xl font-bold">
-                ₹{categories.reduce((sum, c) => sum + c.budget, 0).toLocaleString()}
+                ₹{totalBudget.toLocaleString()}
               </p>
             </div>
             <div className="flex gap-4 text-sm">
@@ -152,88 +247,113 @@ export function CategoriesPage() {
         </CardContent>
       </Card>
 
-      {/* Categories Grid */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {categoryList.map((category) => {
-          const IconComponent = iconMap[category.icon] || Receipt;
-          const spent = getTotalSpent(category.name);
-          const budgetPercent = Math.round((spent / category.budget) * 100);
+      {/* Loading State */}
+      {loading && (
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+        </div>
+      )}
 
-          return (
-            <Card
-              key={category.id}
-              className="group hover:shadow-lg transition-all duration-300 hover:border-opacity-50"
-              style={{ borderColor: category.color }}
-            >
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center"
-                    style={{ backgroundColor: `${category.color}20` }}
-                  >
-                    <IconComponent
-                      className="w-6 h-6"
-                      style={{ color: category.color }}
-                    />
-                  </div>
-                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => {
-                        setSelectedCategory(category);
-                        setIsEditOpen(true);
-                      }}
+      {/* Empty State */}
+      {!loading && categoryList.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <Receipt className="w-12 h-12 text-muted-foreground mb-4" />
+          <p className="text-lg font-medium">No categories yet</p>
+          <p className="text-muted-foreground text-sm mb-4">
+            Create your first category to start organizing expenses.
+          </p>
+          <Button
+            className="gap-2 bg-gradient-to-r from-emerald-500 to-teal-600"
+            onClick={() => setIsAddOpen(true)}
+          >
+            <Plus className="w-4 h-4" />
+            Add Category
+          </Button>
+        </div>
+      )}
+
+      {/* Categories Grid */}
+      {!loading && categoryList.length > 0 && (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {categoryList.map((category) => {
+            const IconComponent = iconMap[category.icon] || Receipt;
+            const budget = category.budget || 0;
+            const spent = 0; // Spending data comes from expenses, left as 0 here
+            const budgetPercent = budget > 0 ? Math.round((spent / budget) * 100) : 0;
+
+            return (
+              <Card
+                key={category.id}
+                className="group hover:shadow-lg transition-all duration-300 hover:border-opacity-50"
+                style={{ borderColor: category.color }}
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between">
+                    <div
+                      className="w-12 h-12 rounded-xl flex items-center justify-center"
+                      style={{ backgroundColor: `${category.color}20` }}
                     >
-                      <Pencil className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-destructive"
-                      onClick={() => {
-                        setSelectedCategory(category);
-                        setIsDeleteOpen(true);
-                      }}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                      <IconComponent
+                        className="w-6 h-6"
+                        style={{ color: category.color }}
+                      />
+                    </div>
+                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => {
+                          setSelectedCategory({ ...category });
+                          setIsEditOpen(true);
+                        }}
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-destructive"
+                        onClick={() => {
+                          setSelectedCategory(category);
+                          setIsDeleteOpen(true);
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
-                </div>
-                <CardTitle className="text-lg">{category.name}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Budget</span>
-                  <span className="font-medium">
-                    ₹{category.budget.toLocaleString()}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Spent</span>
-                  <span
-                    className="font-medium"
-                    style={{ color: budgetPercent > 80 ? '#ef4444' : 'inherit' }}
-                  >
-                    ₹{spent.toLocaleString()}
-                  </span>
-                </div>
-                <Progress
-                  value={Math.min(budgetPercent, 100)}
-                  className="h-2"
-                />
-                <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">{budgetPercent}% used</span>
-                  <span className="text-muted-foreground">
-                    ₹{(category.budget - spent).toLocaleString()} left
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+                  <CardTitle className="text-lg">{category.name}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Budget</span>
+                    <span className="font-medium">
+                      ₹{budget.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Spent</span>
+                    <span
+                      className="font-medium"
+                      style={{ color: budgetPercent > 80 ? '#ef4444' : 'inherit' }}
+                    >
+                      ₹{spent.toLocaleString()}
+                    </span>
+                  </div>
+                  <Progress value={Math.min(budgetPercent, 100)} className="h-2" />
+                  <div className="flex justify-between text-xs">
+                    <span className="text-muted-foreground">{budgetPercent}% used</span>
+                    <span className="text-muted-foreground">
+                      ₹{(budget - spent).toLocaleString()} left
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      )}
 
       {/* Add Category Dialog */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
@@ -310,7 +430,7 @@ export function CategoriesPage() {
                 onChange={(e) =>
                   setNewCategory({
                     ...newCategory,
-                    budget: parseFloat(e.target.value),
+                    budget: parseFloat(e.target.value) || 0,
                   })
                 }
               />
@@ -323,7 +443,9 @@ export function CategoriesPage() {
             <Button
               className="bg-gradient-to-r from-emerald-500 to-teal-600"
               onClick={handleAddCategory}
+              disabled={isSaving}
             >
+              {isSaving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               Add Category
             </Button>
           </DialogFooter>
@@ -335,9 +457,7 @@ export function CategoriesPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Category</DialogTitle>
-            <DialogDescription>
-              Update category details
-            </DialogDescription>
+            <DialogDescription>Update category details</DialogDescription>
           </DialogHeader>
           {selectedCategory && (
             <div className="space-y-4 py-4">
@@ -385,7 +505,7 @@ export function CategoriesPage() {
                   onChange={(e) =>
                     setSelectedCategory({
                       ...selectedCategory,
-                      budget: parseFloat(e.target.value),
+                      budget: parseFloat(e.target.value) || 0,
                     })
                   }
                 />
@@ -399,7 +519,9 @@ export function CategoriesPage() {
             <Button
               className="bg-gradient-to-r from-emerald-500 to-teal-600"
               onClick={handleEditCategory}
+              disabled={isSaving}
             >
+              {isSaving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               Save Changes
             </Button>
           </DialogFooter>
@@ -412,16 +534,21 @@ export function CategoriesPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Category</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this category? All expenses in this
-              category will become uncategorized.
+              Delete this category?{' '}
+              {selectedCategory && (
+                <span className="font-medium">"{selectedCategory.name}"</span>
+              )}{' '}
+              This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground"
               onClick={handleDeleteCategory}
+              disabled={isDeleting}
             >
+              {isDeleting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
