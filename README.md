@@ -1,4 +1,4 @@
-हो, समजलं 😄 तुला **एकच continuous Markdown code box** पाहिजे — सुरुवातीच्या ` ```markdown ` पासून शेवटच्या ` ``` ` पर्यंत सगळं एकाच box मध्ये. मध्ये कुठेही वेगळे boxes नकोत.
+
 
 ```markdown
 # 💰 FinPilot – AI Personal Finance Manager
