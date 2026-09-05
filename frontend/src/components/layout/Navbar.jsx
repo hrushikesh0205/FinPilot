@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { cn } from '@/utils/utils';
+import { cn, getInitials } from '@/utils/utils';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 import { getAllNotifications, getUnreadCount } from '@/services/notificationApi';
@@ -23,19 +23,9 @@ export function Navbar({ collapsed }) {
   const [unreadCount, setUnreadCount] = useState(0);
   const [recentNotifications, setRecentNotifications] = useState([]);
 
-  const getInitials = (name) => {
-    if (!name) return 'U';
-    const parts = name.trim().split(/\s+/);
-    if (parts.length >= 2) {
-      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-    }
-    return name.substring(0, 2).toUpperCase();
-  };
-
   const userName  = user?.name  || 'User';
   const userEmail = user?.email || '';
-  const initials  = getInitials(userName);
-  const profileImage = user?.profileImage || null;
+  const initials  = getInitials(user?.name);
 
   // ── Load notification count + preview ────────────────────────────────
   const fetchNotificationData = useCallback(async () => {
@@ -57,12 +47,6 @@ export function Navbar({ collapsed }) {
   useEffect(() => {
     fetchNotificationData();
   }, [fetchNotificationData]);
-
-  const getImageUrl = (path) => {
-    if (!path) return null;
-    if (path.startsWith('http')) return path;
-    return `http://localhost:8080${path}`;
-  };
 
   return (
     <header
@@ -160,12 +144,8 @@ export function Navbar({ collapsed }) {
                 variant="ghost"
                 className="relative h-10 w-10 p-0 rounded-full hover:bg-[#0F3D2E]/5 dark:hover:bg-[#14532D] transition-colors focus-visible:ring-2 focus-visible:ring-[#0F3D2E] dark:focus-visible:ring-[#16A34A] focus-visible:ring-offset-2"
               >
-                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-semibold text-sm shadow-sm ring-1 ring-border/50 overflow-hidden">
-                  {profileImage ? (
-                    <img src={getImageUrl(profileImage)} alt={userName} className="w-full h-full object-cover" />
-                  ) : (
-                    initials
-                  )}
+                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-semibold text-sm shadow-sm ring-1 ring-border/50 select-none">
+                  {initials}
                 </div>
               </Button>
             </DropdownMenuTrigger>

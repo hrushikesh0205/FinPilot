@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,7 +54,6 @@ public class AuthController {
             response.put("name", user.getName());
             response.put("email", user.getEmail());
             response.put("phoneNumber", user.getPhoneNumber());
-            response.put("profileImage", user.getProfileImage());
             response.put("createdAt", user.getCreatedAt());
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
@@ -77,27 +75,6 @@ public class AuthController {
             response.put("name", updated.getName());
             response.put("email", updated.getEmail());
             response.put("phoneNumber", updated.getPhoneNumber());
-            response.put("profileImage", updated.getProfileImage());
-            response.put("createdAt", updated.getCreatedAt());
-            return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("message", e.getMessage()));
-        }
-    }
-
-    // POST /auth/profile/image — form-data: file
-    @PostMapping("/profile/image")
-    public ResponseEntity<?> uploadProfileImage(
-            @RequestParam("file") MultipartFile file,
-            Authentication authentication) {
-        try {
-            User updated = userService.uploadProfileImage(authentication.getName(), file);
-            Map<String, Object> response = new HashMap<>();
-            response.put("name", updated.getName());
-            response.put("email", updated.getEmail());
-            response.put("phoneNumber", updated.getPhoneNumber());
-            response.put("profileImage", updated.getProfileImage());
             response.put("createdAt", updated.getCreatedAt());
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {

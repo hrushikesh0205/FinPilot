@@ -16,11 +16,6 @@ export const getProfile = () =>
 export const updateProfileDetails = (name, phone) =>
   axiosInstance.put('/auth/profile', { name, phone });
 
-// POST /auth/profile/image — form-data: file
-export const uploadProfileImage = (formData) =>
-  axiosInstance.post('/auth/profile/image', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
 
 // PUT /auth/profile/password — body: { currentPassword, newPassword }
 export const changePassword = (currentPassword, newPassword) =>

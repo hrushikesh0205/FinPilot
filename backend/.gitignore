@@ -4,6 +4,18 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+### Application secrets — NEVER commit these ###
+**/application.properties
+.env
+*.env
+
+### Runtime-generated directories ###
+uploads/
+logs/
+
+### Log files ###
+*.log
+
 ### STS ###
 .apt_generated
 .classpath

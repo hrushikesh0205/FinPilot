@@ -30,198 +30,7 @@ import { cn } from '@/utils/utils';
 import { useToast } from '@/hooks/use-toast';
 import { getAllCategories } from '@/services/categoryApi';
 import { createExpense } from '@/services/expenseApi';
-import Tesseract from 'tesseract.js';
-
-// ─────────────────────────────────────────────────────────────────────────────
-// RECEIPT PARSER — extracts structured data from raw OCR text
-// Returns { merchant, billNumber, date, amount, tax, confidence }
-// confidence: 'high' | 'low' | 'none' per field
-// ─────────────────────────────────────────────────────────────────────────────
-
-function parseReceiptText(rawText) {
-  const lines = rawText
-    .split('\n')
-    .map((l) => l.trim())
-    .filter((l) => l.length > 0);
-
-  const fullText = lines.join('\n');
-
-  // ── Helper: strip non-numeric chars except dot
-  const parseAmount = (str) => {
-    const cleaned = str.replace(/[₹Rs.,\s]/gi, '').replace(/,/g, '');
-    const num = parseFloat(cleaned);
-    return isNaN(num) ? null : num;
-  };
-
-  // ── 1. MERCHANT NAME ─────────────────────────────────────────────────────
-  // Take first meaningful line (length > 2, not a number-only line)
-  let merchant = '';
-  let merchantConfidence = 'none';
-  const skipPatterns = /^(receipt|invoice|bill|tax invoice|gst invoice|date|no\.|number|phone|tel|mob|address|gstin|cin|pan|www\.|http)/i;
-  const numberOnly = /^[\d\s\.\-\/\:]+$/;
-
-  for (const line of lines.slice(0, 8)) {
-    if (line.length > 2 && !numberOnly.test(line) && !skipPatterns.test(line)) {
-      merchant = line.replace(/[*_|]/g, '').trim();
-      merchantConfidence = merchant.length > 2 ? 'high' : 'low';
-      break;
-    }
-  }
-
-  // ── 2. BILL / INVOICE NUMBER ──────────────────────────────────────────────
-  let billNumber = '';
-  let billConfidence = 'none';
-  const billPatterns = [
-    /(?:bill\s*(?:no|number|#)?|invoice\s*(?:no|number|#)?|receipt\s*(?:no|number|#)?|order\s*(?:no|number|#)?)\s*[:\-]?\s*([A-Z0-9\-\/]+)/i,
-    /\b(IN-\d+)\b/i,
-    /\b(INV-\d+)\b/i,
-    /\b(REC-\d+)\b/i,
-    /\b(ORD-\d+)\b/i,
-    /(?:no|#)\s*[:\-]?\s*([A-Z0-9\-\/]{3,15})\b/i,
-  ];
-  for (const pattern of billPatterns) {
-    const match = fullText.match(pattern);
-    if (match) {
-      billNumber = match[1].trim();
-      billConfidence = 'high';
-      break;
-    }
-  }
-
-  // ── 3. DATE ───────────────────────────────────────────────────────────────
-  let date = '';
-  let dateConfidence = 'none';
-
-  const monthMap = {
-    jan: '01', feb: '02', mar: '03', apr: '04', may: '05', jun: '06',
-    jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12',
-  };
-
-  // Patterns ordered by specificity
-  const datePatterns = [
-    // "23-Jan-2025" or "23 Jan 2025" or "23/Jan/2025"
-    {
-      re: /(\d{1,2})[\s\-\/]([A-Za-z]{3,9})[\s\-\/](\d{4})/,
-      fn: (m) => {
-        const mon = monthMap[m[2].toLowerCase().slice(0, 3)];
-        return mon ? `${m[3]}-${mon}-${m[1].padStart(2, '0')}` : null;
-      },
-    },
-    // "Jan 23, 2025" or "January 23 2025"
-    {
-      re: /([A-Za-z]{3,9})[\s](\d{1,2})[,\s]+(\d{4})/,
-      fn: (m) => {
-        const mon = monthMap[m[1].toLowerCase().slice(0, 3)];
-        return mon ? `${m[3]}-${mon}-${m[2].padStart(2, '0')}` : null;
-      },
-    },
-    // "23/01/2025" or "23-01-2025"
-    {
-      re: /(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/,
-      fn: (m) => `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`,
-    },
-    // "2025/01/23" or "2025-01-23"
-    {
-      re: /(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/,
-      fn: (m) => `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`,
-    },
-    // "23.01.25" short year
-    {
-      re: /(\d{1,2})\.(\d{1,2})\.(\d{2})\b/,
-      fn: (m) => `20${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`,
-    },
-  ];
-
-  for (const { re, fn } of datePatterns) {
-    const match = fullText.match(re);
-    if (match) {
-      const result = fn(match);
-      if (result) {
-        // Validate that result is a plausible date
-        const d = new Date(result);
-        if (!isNaN(d.getTime()) && d.getFullYear() >= 2000 && d.getFullYear() <= 2099) {
-          date = result;
-          dateConfidence = 'high';
-          break;
-        }
-      }
-    }
-  }
-
-  // ── 4. AMOUNTS — pick GRAND TOTAL ─────────────────────────────────────────
-  // Priority: Grand Total > Total Amount > Total > Net Amount > largest number
-  let amount = '';
-  let amountConfidence = 'none';
-
-  const totalPatterns = [
-    /grand\s*total\s*[:\-]?\s*[₹Rs.]?\s*([\d,]+\.?\d*)/i,
-    /total\s*amount\s*[:\-]?\s*[₹Rs.]?\s*([\d,]+\.?\d*)/i,
-    /amount\s*payable\s*[:\-]?\s*[₹Rs.]?\s*([\d,]+\.?\d*)/i,
-    /net\s*(?:total|amount)\s*[:\-]?\s*[₹Rs.]?\s*([\d,]+\.?\d*)/i,
-    /payable\s*amount\s*[:\-]?\s*[₹Rs.]?\s*([\d,]+\.?\d*)/i,
-    /\btotal\b\s*[:\-]?\s*[₹Rs.]?\s*([\d,]+\.?\d*)/i,
-    /balance\s*due\s*[:\-]?\s*[₹Rs.]?\s*([\d,]+\.?\d*)/i,
-    /amount\s*due\s*[:\-]?\s*[₹Rs.]?\s*([\d,]+\.?\d*)/i,
-  ];
-
-  for (const pattern of totalPatterns) {
-    const match = fullText.match(pattern);
-    if (match) {
-      const num = parseAmount(match[1]);
-      if (num !== null && num > 0) {
-        amount = String(num);
-        amountConfidence = 'high';
-        break;
-      }
-    }
-  }
-
-  // Fallback: scan each line for a ₹ sign followed by a number, pick the largest
-  if (!amount) {
-    const rupeePattern = /[₹Rs.]\s*([\d,]+\.?\d*)/g;
-    let largest = 0;
-    let match;
-    while ((match = rupeePattern.exec(fullText)) !== null) {
-      const num = parseAmount(match[1]);
-      if (num !== null && num > largest) {
-        largest = num;
-      }
-    }
-    if (largest > 0) {
-      amount = String(largest);
-      amountConfidence = 'low';
-    }
-  }
-
-  // ── 5. TAX ────────────────────────────────────────────────────────────────
-  let tax = '';
-  const taxPatterns = [
-    /(?:gst|tax|vat|cgst|sgst|igst)\s*(?:total|amount)?\s*[:\-]?\s*[₹Rs.]?\s*([\d,]+\.?\d*)/i,
-    /(?:total\s*(?:gst|tax))\s*[:\-]?\s*[₹Rs.]?\s*([\d,]+\.?\d*)/i,
-  ];
-  for (const pattern of taxPatterns) {
-    const match = fullText.match(pattern);
-    if (match) {
-      const num = parseAmount(match[1]);
-      if (num !== null && num > 0) {
-        tax = String(num);
-        break;
-      }
-    }
-  }
-
-  return {
-    merchant,
-    merchantConfidence,
-    billNumber,
-    billConfidence,
-    date,
-    dateConfidence,
-    amount,
-    amountConfidence,
-    tax,
-  };
-}
+import { scanReceipt } from '@/services/aiApi';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Confidence badge helper
@@ -322,33 +131,40 @@ export function ScannerPage() {
     await runOCR(file);
   };
 
-  // ── Core OCR function using Tesseract.js ─────────────────────────────────
+  // ── Core OCR function using Backend AI Multimodal OCR ─────────────────────
   const runOCR = async (file) => {
     setOcrStatus('ocr');
+    setOcrProgress(30);
     try {
-      const result = await Tesseract.recognize(file, 'eng', {
-        logger: (m) => {
-          if (m.status === 'recognizing text') {
-            setOcrProgress(Math.round(m.progress * 100));
-          }
-        },
-      });
+      setOcrProgress(60);
+      const res = await scanReceipt(file);
+      const data = res.data;
 
-      const rawText = result.data.text;
-      setOcrRawText(rawText);
-
+      setOcrRawText(data.rawText || JSON.stringify(data, null, 2));
+      setOcrProgress(90);
       setOcrStatus('parsing');
-      await new Promise((r) => setTimeout(r, 300)); // brief pause for UI
+      await new Promise((r) => setTimeout(r, 200));
 
-      const parsed = parseReceiptText(rawText);
-      setExtractedData({ ...emptyExtracted, ...parsed });
+      setExtractedData({
+        merchant: data.merchant || '',
+        merchantConfidence: data.merchant ? 'high' : 'none',
+        billNumber: data.receiptNumber || '',
+        billConfidence: data.receiptNumber ? 'high' : 'none',
+        date: data.date || '',
+        dateConfidence: data.date ? 'high' : 'none',
+        amount: data.total != null ? String(data.total) : (data.subtotal != null ? String(data.subtotal) : ''),
+        amountConfidence: (data.total != null || data.subtotal != null) ? 'high' : 'none',
+        tax: data.tax != null && data.tax > 0 ? String(data.tax) : '',
+        category: data.category || '',
+      });
+      setOcrProgress(100);
       setOcrStatus('done');
     } catch (err) {
-      console.error('OCR failed:', err);
+      console.error('AI Receipt OCR failed:', err);
       setOcrStatus('error');
       toast({
-        title: 'OCR Failed',
-        description: 'Could not read the image. Please try a clearer photo.',
+        title: 'Receipt Scan Failed',
+        description: err?.response?.data?.message || 'Could not scan the receipt. Please try a clearer photo or check your OpenRouter API key.',
         variant: 'destructive',
       });
     }
@@ -422,10 +238,10 @@ export function ScannerPage() {
   const statusLabel = {
     idle:     '',
     uploading:'Loading image…',
-    ocr:      `Performing OCR… ${ocrProgress}%`,
-    parsing:  'Parsing receipt data…',
+    ocr:      'AI scanning receipt…',
+    parsing:  'Extracting structured data…',
     done:     'Extraction complete',
-    error:    'OCR failed',
+    error:    'Scan failed',
   }[ocrStatus];
 
   return (
@@ -434,7 +250,7 @@ export function ScannerPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">Receipt Scanner</h1>
-          <p className="text-muted-foreground">Upload a receipt — real OCR extracts the details automatically</p>
+          <p className="text-muted-foreground">Upload a receipt — AI extracts details automatically</p>
         </div>
       </div>
 
@@ -470,7 +286,7 @@ export function ScannerPage() {
                 </Button>
               </label>
               <p className="text-xs text-muted-foreground">
-                Supports: JPG, PNG, WEBP (Max 10MB) · OCR powered by Tesseract.js
+                Supports: JPG, PNG, WEBP (Max 10MB) · AI Multimodal Vision OCR
               </p>
             </div>
           </CardContent>

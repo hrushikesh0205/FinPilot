@@ -10,20 +10,15 @@ import {
   AlertCircle,
   Lightbulb,
   RefreshCw,
-  ArrowUpRight,
-  ArrowDownRight,
   CreditCard,
-  Film,
-  Car,
-  UtensilsCrossed,
   Target,
   Loader2,
+  CheckCircle2,
 } from 'lucide-react';
 import { cn } from '@/utils/utils';
-import { aiInsights, budgets, categoryExpenses, monthlyData } from '@/constants/appData';
+import { useToast } from '@/hooks/use-toast';
+import { getFinancialInsights } from '@/services/aiApi';
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -50,70 +45,121 @@ const spendingTrend = [
   { day: 'Sun', amount: 1800 },
 ];
 
+function classifyInsight(text, index) {
+  const lower = text.toLowerCase();
+  if (lower.includes('alert') || lower.includes('warning') || lower.includes('exceed') || lower.includes('over budget') || lower.includes('limit')) {
+    return {
+      id: `ai-ins-${index}`,
+      title: 'Budget Alert',
+      description: text,
+      type: 'alert',
+      severity: 'warning',
+      icon: AlertCircle,
+    };
+  }
+  if (lower.includes('sav') || lower.includes('reduc') || lower.includes('cut') || lower.includes('optimiz')) {
+    return {
+      id: `ai-ins-${index}`,
+      title: 'Savings Opportunity',
+      description: text,
+      type: 'saving',
+      severity: 'success',
+      icon: PiggyBank,
+    };
+  }
+  return {
+    id: `ai-ins-${index}`,
+    title: 'Spending Pattern',
+    description: text,
+    type: 'spending',
+    severity: 'info',
+    icon: TrendingUp,
+  };
+}
+
 export function InsightsPage() {
+  const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedInsights, setGeneratedInsights] = useState(aiInsights);
+  const [aiData, setAiData] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [hasGenerated, setHasGenerated] = useState(false);
 
-  const handleGenerateInsights = () => {
+  // Automatically fetch real insights on first load
+  useEffect(() => {
+    handleGenerateInsights(true);
+  }, []);
+
+  const handleGenerateInsights = async (isInitial = false) => {
     setIsGenerating(true);
-    setTimeout(() => {
-      setGeneratedInsights(aiInsights);
-      setIsGenerating(false);
+    try {
+      const res = await getFinancialInsights();
+      setAiData(res.data);
       setHasGenerated(true);
-    }, 2000);
+      if (!isInitial) {
+        toast({
+          title: 'Insights Updated',
+          description: 'AI analyzed your latest transactions and budgets.',
+        });
+      }
+    } catch (err) {
+      console.error('Failed to generate AI insights:', err);
+      const errMsg = err?.response?.data?.message || 'Could not fetch AI insights. Please verify OpenRouter configuration.';
+      if (!isInitial) {
+        toast({
+          title: 'Analysis Failed',
+          description: errMsg,
+          variant: 'destructive',
+        });
+      }
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
-  const filteredInsights = generatedInsights.filter(
+  const parsedInsights = (aiData?.keyInsights || []).map((text, idx) =>
+    classifyInsight(text, idx)
+  );
+
+  const filteredInsights = parsedInsights.filter(
     (insight) => selectedCategory === 'all' || insight.type === selectedCategory
   );
 
-  const getIconComponent = (iconName) => {
-    const icons = {
-      TrendingUp,
-      PiggyBank,
-      AlertCircle,
-      Film,
-      Car,
-      UtensilsCrossed,
-      CreditCard,
-      Lightbulb,
-    };
-    return icons[iconName] || Lightbulb;
-  };
+  const totalSpent = aiData?.totalSpent || 0;
+  const totalBudget = aiData?.totalBudget || 0;
+  const remainingBudget = Math.max(0, totalBudget - totalSpent);
+  const recommendations = aiData?.recommendations || [];
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold">AI Insights</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">AI Financial Insights</h1>
           <p className="text-muted-foreground">
-            Personalized financial recommendations powered by AI
+            Personalized intelligence and saving strategies powered by OpenRouter AI
           </p>
         </div>
         <Button
-          className="gap-2 bg-gradient-to-r from-emerald-500 to-teal-600"
-          onClick={handleGenerateInsights}
+          className="gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 shadow-md hover:shadow-emerald-500/20"
+          onClick={() => handleGenerateInsights(false)}
           disabled={isGenerating}
         >
           {isGenerating ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              Analyzing...
+              Analyzing with AI...
             </>
           ) : (
             <>
-              <Sparkles className="w-4 h-4" />
-              Generate Insights
+              <RefreshCw className="w-4 h-4" />
+              Refresh AI Insights
             </>
           )}
         </Button>
       </div>
 
-      {/* AI Animation Card */}
-      {!hasGenerated && (
+      {/* Hero Welcome Card (Only shown if never generated and not loading) */}
+      {!hasGenerated && !isGenerating && (
         <Card className="bg-gradient-to-br from-emerald-500/10 via-cyan-500/5 to-violet-500/10 border-emerald-500/20">
           <CardContent className="p-8 text-center">
             <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
@@ -121,26 +167,17 @@ export function InsightsPage() {
             </div>
             <h2 className="text-2xl font-bold mb-2">Unlock AI-Powered Insights</h2>
             <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
-              Our AI analyzes your spending patterns, identifies trends, and provides
-              personalized recommendations to help you save more money.
+              Our backend AI analyzes your real spending patterns, monitors your budgets, and delivers
+              tailored recommendations to accelerate your savings.
             </p>
             <Button
               size="lg"
               className="gap-2 bg-gradient-to-r from-emerald-500 to-teal-600"
-              onClick={handleGenerateInsights}
+              onClick={() => handleGenerateInsights(false)}
               disabled={isGenerating}
             >
-              {isGenerating ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Analyzing Your Data...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-5 h-5" />
-                  Generate AI Insights
-                </>
-              )}
+              <Sparkles className="w-5 h-5" />
+              Generate Real AI Insights
             </Button>
           </CardContent>
         </Card>
@@ -148,17 +185,17 @@ export function InsightsPage() {
 
       {/* Loading State */}
       {isGenerating && (
-        <Card className="bg-gradient-to-r from-emerald-500/5 to-teal-500/5">
-          <CardContent className="p-8">
+        <Card className="bg-gradient-to-r from-emerald-500/5 to-teal-500/5 border-emerald-500/20">
+          <CardContent className="p-10">
             <div className="flex flex-col items-center justify-center space-y-4">
               <div className="relative">
                 <div className="w-16 h-16 rounded-full border-4 border-emerald-500/30 border-t-emerald-500 animate-spin" />
                 <Sparkles className="w-6 h-6 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-emerald-500" />
               </div>
               <div className="text-center">
-                <p className="font-medium">Analyzing your finances...</p>
+                <p className="font-semibold text-lg">FinPilot AI is analyzing your finances…</p>
                 <p className="text-sm text-muted-foreground">
-                  Processing 156 transactions
+                  Evaluating category spending, budget limits, and savings opportunities
                 </p>
               </div>
             </div>
@@ -166,59 +203,88 @@ export function InsightsPage() {
         </Card>
       )}
 
-      {/* Insights Grid */}
+      {/* Insights Content */}
       {hasGenerated && !isGenerating && (
         <>
-          {/* Quick Stats */}
+          {/* AI Health Summary Card */}
+          {aiData?.summary && (
+            <Card className="bg-gradient-to-r from-emerald-500/10 via-teal-500/5 to-cyan-500/10 border-emerald-500/25 shadow-sm">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center flex-shrink-0 text-white shadow-md">
+                    <Sparkles className="w-5 h-5" />
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-base">Financial Health Summary</h3>
+                      <Badge className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-0 text-xs">
+                        Real-time AI
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {aiData.summary}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Quick Stats Grid */}
           <div className="grid sm:grid-cols-4 gap-4">
-            <Card className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5">
+            <Card className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border-emerald-500/20">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
-                    <PiggyBank className="w-5 h-5 text-emerald-500" />
+                    <CreditCard className="w-5 h-5 text-emerald-500" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Savings Found</p>
-                    <p className="text-xl font-bold">₹8,500</p>
+                    <p className="text-sm text-muted-foreground">Total Spent</p>
+                    <p className="text-xl font-bold">₹{totalSpent.toLocaleString()}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-gradient-to-br from-cyan-500/10 to-cyan-500/5">
+
+            <Card className="bg-gradient-to-br from-cyan-500/10 to-cyan-500/5 border-cyan-500/20">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center">
-                    <TrendingDown className="w-5 h-5 text-cyan-500" />
+                    <Target className="w-5 h-5 text-cyan-500" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Reduced By</p>
-                    <p className="text-xl font-bold">15%</p>
+                    <p className="text-sm text-muted-foreground">Total Budget</p>
+                    <p className="text-xl font-bold">₹{totalBudget.toLocaleString()}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-gradient-to-br from-violet-500/10 to-violet-500/5">
+
+            <Card className="bg-gradient-to-br from-violet-500/10 to-violet-500/5 border-violet-500/20">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-violet-500/20 flex items-center justify-center">
-                    <Target className="w-5 h-5 text-violet-500" />
+                    <PiggyBank className="w-5 h-5 text-violet-500" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Goals</p>
-                    <p className="text-xl font-bold">3/5</p>
+                    <p className="text-sm text-muted-foreground">
+                      {totalBudget > 0 ? 'Budget Remaining' : 'Savings Tracked'}
+                    </p>
+                    <p className="text-xl font-bold">₹{remainingBudget.toLocaleString()}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-gradient-to-br from-amber-500/10 to-amber-500/5">
+
+            <Card className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 border-amber-500/20">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center">
-                    <AlertCircle className="w-5 h-5 text-amber-500" />
+                    <Sparkles className="w-5 h-5 text-amber-500" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Alerts</p>
-                    <p className="text-xl font-bold">2</p>
+                    <p className="text-sm text-muted-foreground">Key Insights</p>
+                    <p className="text-xl font-bold">{parsedInsights.length}</p>
                   </div>
                 </div>
               </CardContent>
@@ -228,8 +294,8 @@ export function InsightsPage() {
           {/* Spending Trend Chart */}
           <Card>
             <CardHeader>
-              <CardTitle>This Week's Spending Pattern</CardTitle>
-              <CardDescription>AI detected unusual spending on Saturday</CardDescription>
+              <CardTitle>Spending Pattern Analysis</CardTitle>
+              <CardDescription>Visual distribution of expenditures over time</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="h-[200px]">
@@ -244,7 +310,7 @@ export function InsightsPage() {
                         border: '1px solid hsl(var(--border))',
                         borderRadius: '8px',
                       }}
-                      formatter={(value) => [`₹${value.toLocaleString()}`, '']}
+                      formatter={(value) => [`₹${value.toLocaleString()}`, 'Amount']}
                     />
                     <Area
                       type="monotone"
@@ -282,128 +348,103 @@ export function InsightsPage() {
           </div>
 
           {/* Insights Cards */}
-          <div className="grid md:grid-cols-2 gap-4">
-            {filteredInsights.map((insight) => {
-              const IconComponent = getIconComponent(insight.icon);
-
-              return (
-                <Card
-                  key={insight.id}
-                  className={cn(
-                    'group hover:shadow-lg transition-all duration-300',
-                    insight.severity === 'warning'
-                      ? 'bg-gradient-to-br from-amber-500/5 to-orange-500/5 border-amber-500/20'
-                      : insight.severity === 'success'
-                      ? 'bg-gradient-to-br from-emerald-500/5 to-green-500/5 border-emerald-500/20'
-                      : 'bg-gradient-to-br from-cyan-500/5 to-blue-500/5 border-cyan-500/20'
-                  )}
-                >
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
-                      <div
-                        className={cn(
-                          'w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0',
-                          insight.severity === 'warning'
-                            ? 'bg-amber-500/20'
-                            : insight.severity === 'success'
-                            ? 'bg-emerald-500/20'
-                            : 'bg-cyan-500/20'
-                        )}
-                      >
-                        <IconComponent
+          {filteredInsights.length === 0 ? (
+            <Card className="p-8 text-center text-muted-foreground">
+              No insights under this filter category. Try selecting "All Insights".
+            </Card>
+          ) : (
+            <div className="grid md:grid-cols-2 gap-4">
+              {filteredInsights.map((insight) => {
+                const IconComponent = insight.icon;
+                return (
+                  <Card
+                    key={insight.id}
+                    className={cn(
+                      'group hover:shadow-lg transition-all duration-300',
+                      insight.severity === 'warning'
+                        ? 'bg-gradient-to-br from-amber-500/5 to-orange-500/5 border-amber-500/20'
+                        : insight.severity === 'success'
+                        ? 'bg-gradient-to-br from-emerald-500/5 to-green-500/5 border-emerald-500/20'
+                        : 'bg-gradient-to-br from-cyan-500/5 to-blue-500/5 border-cyan-500/20'
+                    )}
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex items-start gap-4">
+                        <div
                           className={cn(
-                            'w-6 h-6',
+                            'w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0',
                             insight.severity === 'warning'
-                              ? 'text-amber-500'
+                              ? 'bg-amber-500/20 text-amber-500'
                               : insight.severity === 'success'
-                              ? 'text-emerald-500'
-                              : 'text-cyan-500'
+                              ? 'bg-emerald-500/20 text-emerald-500'
+                              : 'bg-cyan-500/20 text-cyan-500'
                           )}
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-semibold">{insight.title}</span>
-                          <Badge
-                            variant="outline"
-                            className={cn(
-                              'text-xs',
-                              insight.severity === 'warning'
-                                ? 'border-amber-500/30 text-amber-600 dark:text-amber-400'
-                                : insight.severity === 'success'
-                                ? 'border-emerald-500/30 text-emerald-600 dark:text-emerald-400'
-                                : 'border-cyan-500/30 text-cyan-600 dark:text-cyan-400'
-                            )}
-                          >
-                            {insight.type}
-                          </Badge>
+                        >
+                          <IconComponent className="w-6 h-6" />
                         </div>
-                        <p className="text-sm text-muted-foreground">
-                          {insight.description}
-                        </p>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-semibold">{insight.title}</span>
+                            <Badge
+                              variant="outline"
+                              className={cn(
+                                'text-xs capitalize',
+                                insight.severity === 'warning'
+                                  ? 'border-amber-500/30 text-amber-600 dark:text-amber-400'
+                                  : insight.severity === 'success'
+                                  ? 'border-emerald-500/30 text-emerald-600 dark:text-emerald-400'
+                                  : 'border-cyan-500/30 text-cyan-600 dark:text-cyan-400'
+                              )}
+                            >
+                              {insight.type}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            {insight.description}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
 
           {/* Action Suggestions */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Lightbulb className="w-5 h-5 text-amber-500" />
-                Suggested Actions
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {[
-                  {
-                    action: 'Set up automatic savings transfer',
-                    impact: 'Save ₹5,000/month',
-                    priority: 'high',
-                  },
-                  {
-                    action: 'Reduce restaurant spending by 30%',
-                    impact: 'Save ₹2,500/month',
-                    priority: 'medium',
-                  },
-                  {
-                    action: 'Review and cancel unused subscriptions',
-                    impact: 'Save ₹1,200/month',
-                    priority: 'low',
-                  },
-                ].map((item, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center justify-between p-4 rounded-lg bg-muted/50"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={cn(
-                          'w-2 h-2 rounded-full',
-                          item.priority === 'high'
-                            ? 'bg-rose-500'
-                            : item.priority === 'medium'
-                            ? 'bg-amber-500'
-                            : 'bg-emerald-500'
-                        )}
-                      />
-                      <span className="font-medium">{item.action}</span>
+          {recommendations.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Lightbulb className="w-5 h-5 text-amber-500" />
+                  AI Suggested Actions & Recommendations
+                </CardTitle>
+                <CardDescription>
+                  Custom-tailored financial steps based on your recent activity
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {recommendations.map((rec, i) => (
+                    <div
+                      key={i}
+                      className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-lg bg-muted/40 hover:bg-muted/60 transition-colors gap-3 border border-border/50"
+                    >
+                      <div className="flex items-start sm:items-center gap-3">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5 sm:mt-0" />
+                        <span className="text-sm font-medium leading-relaxed">{rec}</span>
+                      </div>
+                      <div className="flex items-center gap-2 self-end sm:self-auto flex-shrink-0">
+                        <Badge variant="outline" className="text-emerald-600 dark:text-emerald-400 border-emerald-500/30 text-xs">
+                          Action Item
+                        </Badge>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <Badge variant="outline" className="text-emerald-600 dark:text-emerald-400">
-                        {item.impact}
-                      </Badge>
-                      <Button size="sm">Apply</Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </>
       )}
     </div>

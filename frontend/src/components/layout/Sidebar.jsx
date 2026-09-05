@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { cn } from '@/utils/utils';
+import { cn, getInitials } from '@/utils/utils';
 import {
   LayoutDashboard,
   Receipt,
@@ -40,18 +40,7 @@ export function Sidebar({ currentPage, setCurrentPage, collapsed, setCollapsed }
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, logout } = useAuth();
 
-  // Generate initials from user name
-  const initials = user?.name
-    ? user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
-    : '?';
-    
-  const profileImage = user?.profileImage || null;
-
-  const getImageUrl = (path) => {
-    if (!path) return null;
-    if (path.startsWith('http')) return path;
-    return `http://localhost:8080${path}`;
-  };
+  const initials = getInitials(user?.name);
 
   return (
     <>
@@ -148,12 +137,8 @@ export function Sidebar({ currentPage, setCurrentPage, collapsed, setCollapsed }
             {!collapsed ? (
               <div className="space-y-2">
                 <div className="flex items-center gap-3 p-2 rounded-lg bg-muted/50">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0 overflow-hidden shadow-sm ring-1 ring-border/50">
-                    {profileImage ? (
-                      <img src={getImageUrl(profileImage)} alt={user?.name || 'User'} className="w-full h-full object-cover" />
-                    ) : (
-                      initials
-                    )}
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0 shadow-sm ring-1 ring-border/50 select-none">
+                    {initials}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{user?.name || 'User'}</p>

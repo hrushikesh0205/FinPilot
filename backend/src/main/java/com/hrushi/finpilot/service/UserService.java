@@ -5,20 +5,11 @@ import com.hrushi.finpilot.entity.User;
 import com.hrushi.finpilot.repository.UserRepository;
 import com.hrushi.finpilot.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class UserService {
@@ -86,42 +77,6 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    // Upload profile image
-    @Transactional
-    public User uploadProfileImage(String email, MultipartFile file) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        if (file.isEmpty()) {
-            throw new RuntimeException("File is empty");
-        }
-
-        try {
-            // Use an absolute path for safety during development
-            String uploadDir = System.getProperty("user.dir") + "/uploads/profile_images/";
-            File dir = new File(uploadDir);
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
-
-            // Generate unique filename
-            String originalFilename = file.getOriginalFilename();
-            String extension = originalFilename != null && originalFilename.contains(".") ? 
-                    originalFilename.substring(originalFilename.lastIndexOf(".")) : ".jpg";
-            String newFilename = UUID.randomUUID().toString() + extension;
-
-            Path targetLocation = Paths.get(uploadDir + newFilename);
-            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-
-            // Save the relative URL path in DB
-            String fileUrl = "/uploads/profile_images/" + newFilename;
-            user.setProfileImage(fileUrl);
-            return userRepository.save(user);
-            
-        } catch (IOException e) {
-            throw new RuntimeException("Could not store file", e);
-        }
-    }
 
     // Change password — verifies current password before updating
     @Transactional

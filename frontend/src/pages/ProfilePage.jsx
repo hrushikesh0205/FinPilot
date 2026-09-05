@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,12 +17,12 @@ import {
   Phone,
   Calendar,
   Pencil,
-  Camera,
   Loader2,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
-import { getProfile, updateProfileDetails, uploadProfileImage } from '@/services/authApi';
+import { getProfile, updateProfileDetails } from '@/services/authApi';
+import { getInitials } from '@/utils/utils';
 import { format } from 'date-fns';
 
 export function ProfilePage() {
@@ -34,10 +34,6 @@ export function ProfilePage() {
   const [editData, setEditData] = useState({ name: '', phone: '' });
   const [isSaving, setIsSaving] = useState(false);
   
-  // Image upload state
-  const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef(null);
-  
   const { toast } = useToast();
   const { updateUser } = useAuth();
 
@@ -45,8 +41,7 @@ export function ProfilePage() {
     try {
       const res = await getProfile();
       setProfile(res.data);
-      // Ensure global user state has the image on load if they just logged in
-      updateUser({ name: res.data.name, profileImage: res.data.profileImage });
+      updateUser({ name: res.data.name });
     } catch (err) {
       toast({
         title: 'Error',
@@ -97,51 +92,6 @@ export function ProfilePage() {
     }
   };
 
-  const handleImageUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Validate type (JPG, JPEG, PNG)
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-    if (!validTypes.includes(file.type)) {
-      toast({
-        title: 'Invalid file type',
-        description: 'Please select a JPG, JPEG, or PNG image.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    try {
-      setIsUploading(true);
-      const formData = new FormData();
-      formData.append('file', file);
-      
-      const res = await uploadProfileImage(formData);
-      setProfile(res.data);
-      updateUser({ profileImage: res.data.profileImage });
-      toast({ title: 'Success', description: 'Profile image updated.' });
-    } catch (err) {
-      toast({
-        title: 'Upload failed',
-        description: err?.response?.data?.message || 'Could not upload image.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsUploading(false);
-      // Reset file input so same file can be selected again
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    }
-  };
-
-  const getImageUrl = (path) => {
-    if (!path) return null;
-    if (path.startsWith('http')) return path;
-    return `http://localhost:8080${path}`;
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[50vh]">
@@ -152,8 +102,6 @@ export function ProfilePage() {
 
   if (!profile) return null;
 
-  const imageUrl = getImageUrl(profile.profileImage);
-  
   // Format member since date
   const memberSince = profile.createdAt 
     ? format(new Date(profile.createdAt), 'MMMM yyyy')
@@ -173,35 +121,8 @@ export function ProfilePage() {
       <Card>
         <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-            <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-              {imageUrl ? (
-                <img
-                  src={imageUrl}
-                  alt={profile.name}
-                  className="w-24 h-24 rounded-full object-cover border-4 border-emerald-500/20 group-hover:opacity-80 transition-opacity"
-                />
-              ) : (
-                <div className="w-24 h-24 rounded-full bg-emerald-500/10 border-4 border-emerald-500/20 flex items-center justify-center text-emerald-600 text-3xl font-bold uppercase group-hover:bg-emerald-500/20 transition-colors">
-                  {profile.name.charAt(0)}
-                </div>
-              )}
-              <button 
-                className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white hover:bg-emerald-600 transition-colors"
-                disabled={isUploading}
-              >
-                {isUploading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Camera className="w-4 h-4" />
-                )}
-              </button>
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleImageUpload}
-                accept="image/jpeg, image/jpg, image/png"
-                className="hidden"
-              />
+            <div className="w-24 h-24 rounded-full bg-emerald-500/10 border-4 border-emerald-500/20 flex items-center justify-center text-emerald-600 text-3xl font-bold uppercase select-none shadow-sm">
+              {getInitials(profile.name)}
             </div>
             
             <div className="text-center sm:text-left flex-1 mt-2">
