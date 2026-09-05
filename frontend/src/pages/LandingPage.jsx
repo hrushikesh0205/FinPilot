@@ -1,13 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { cn } from '@/utils/utils';
 import {
-  TrendingUp, Shield, BarChart3, PiggyBank, Receipt, Sparkles,
+  BarChart3, PiggyBank, Sparkles,
   ChevronDown, Menu, X, ArrowRight, Play, Target,
-  ArrowUpRight, ArrowDownRight, Zap, Check, Star,
-  Twitter, Linkedin, Github, Send, Lock,
+  ArrowUpRight, ArrowDownRight, Zap, Star, Lock,
 } from 'lucide-react';
 
-import { C, FEATURES, TESTIMONIALS, FAQS, NAV, AI_INSIGHTS } from '@/constants/landingData';
+import { C, FEATURES, TESTIMONIALS, FAQS, NAV } from '@/constants/landingData';
 import { SiteFooter } from '@/components/layout/SiteFooter';
 import { FinPilotLogo } from '@/components/common/FinPilotLogo';
 
@@ -27,13 +26,6 @@ function useReveal(threshold = 0.12) {
   }, [threshold]);
   return [ref, visible];
 }
-
-const AI_CHAT = [
-  { role: 'user', text: 'How can I save more this month?' },
-  { role: 'ai',   text: 'Based on your patterns, you spend ₹4,200/month dining out. Reducing this by 30% would save ₹1,260 monthly. Want me to set a budget alert?' },
-  { role: 'user', text: 'Yes, set it to ₹2,500.' },
-  { role: 'ai',   text: "Done! I've set your restaurant budget to ₹2,500. You'll get smart alerts at 50%, 75%, and 90% of your limit." },
-];
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    MAIN LANDING PAGE
@@ -462,7 +454,7 @@ export function LandingPage({ setCurrentPage }) {
               <div className="mx-auto w-12 h-12 rounded-xl flex items-center justify-center bg-purple-50 text-purple-600 mb-4 shadow-sm border border-purple-100">
                 <Sparkles className="w-6 h-6" />
               </div>
-              <h3 className="font-semibold text-slate-900">AI Advisor</h3>
+              <h3 className="font-semibold text-slate-900">AI Insights</h3>
               <p className="mt-2 text-sm text-gray-500">
                 Personalized saving recommendations.
               </p>
@@ -496,11 +488,6 @@ export function LandingPage({ setCurrentPage }) {
       {/* ══ FEATURES ════════════════════════════════════════════════════════ */}
       <section id="features" className="pt-12 pb-24 md:pt-24 md:pb-24 bg-white">
         <FeaturesSection />
-      </section>
-
-      {/* ══ AI INSIGHTS ═════════════════════════════════════════════════════ */}
-      <section id="ai-insights" className="py-20 md:py-24" style={{ background: C.primary }}>
-        <AISection />
       </section>
 
       {/* ══ TESTIMONIALS ════════════════════════════════════════════════════ */}
@@ -573,133 +560,6 @@ function FeaturesSection() {
             </div>
           );
         })}
-      </div>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════════
-   AI SECTION
-══════════════════════════════════════════════════════════════════════════════ */
-function AISection() {
-  const [ref, visible] = useReveal(0.1);
-
-  return (
-    <div ref={ref} className="max-w-[1440px] mx-auto px-4 md:px-8">
-      <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-
-        {/* Left — copy & insight list */}
-        <div className={visible ? 'fp-anim-left' : 'opacity-0'}>
-          <span className="text-xs font-bold tracking-[0.16em] uppercase inline-block mb-4 text-green-400">
-            AI POWERED
-          </span>
-          <h2 className="text-3xl sm:text-[2.5rem] font-bold tracking-tight text-white leading-[1.15] mb-5">
-            Your Personal AI{' '}
-            <span style={{ color: C.amber }}>Financial Advisor</span>
-          </h2>
-          <p className="text-base leading-relaxed mb-8" style={{ color: 'rgba(255,255,255,0.58)' }}>
-            FinPilot AI analyzes your spending patterns, identifies savings opportunities, and provides
-            personalized recommendations that make a real difference to your finances.
-          </p>
-
-          <div className="space-y-3">
-            {AI_INSIGHTS.map((ins, i) => {
-              const InsIcon = ins.icon;
-              return (
-                <div
-                  key={i}
-                  className="flex items-center gap-4 p-4 rounded-xl cursor-pointer transition-all duration-200 hover:bg-white/5"
-                  style={{ background: 'rgba(255,255,255,0.03)' }}
-                >
-                  <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                    style={{ background: `${ins.color}20` }}
-                  >
-                    <InsIcon className="w-5 h-5" style={{ color: ins.color }} />
-                  </div>
-                  <p className="text-sm text-white font-medium">{ins.text}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Right — chat UI mockup */}
-        <div className={visible ? 'fp-anim-right' : 'opacity-0'}>
-          <div
-            className="rounded-2xl overflow-hidden"
-            style={{
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              boxShadow: '0 36px 72px rgba(0,0,0,0.25)',
-            }}
-          >
-            {/* Chat header */}
-            <div
-              className="flex items-center gap-3 px-6 py-4 border-b"
-              style={{ borderColor: 'rgba(255,255,255,0.07)' }}
-            >
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center"
-                style={{ background: `linear-gradient(135deg, ${C.amber}, #FBBF24)` }}
-              >
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <p className="font-semibold text-white text-sm">FinPilot AI</p>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 fp-pulse" />
-                  <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.38)' }}>
-                    Always learning, always helping
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Messages */}
-            <div className="p-5 space-y-4">
-              {AI_CHAT.map((m, i) => (
-                <div key={i} className={cn('flex gap-3', m.role === 'user' && 'flex-row-reverse')}>
-                  <div
-                    className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 text-[10px] font-bold"
-                    style={{
-                      background: m.role === 'ai' ? `${C.amber}28` : 'rgba(255,255,255,0.1)',
-                      color: m.role === 'ai' ? C.amber : 'white',
-                    }}
-                  >
-                    {m.role === 'ai' ? <Sparkles className="w-4 h-4" /> : 'YOU'}
-                  </div>
-                  <div
-                    className="max-w-[82%] px-4 py-3 rounded-2xl text-sm text-white leading-relaxed"
-                    style={{ background: m.role === 'ai' ? `${C.amber}15` : 'rgba(255,255,255,0.07)' }}
-                  >
-                    {m.text}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Input bar */}
-            <div className="px-5 py-4 border-t" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-              <div
-                className="flex items-center gap-3 px-4 py-3 rounded-xl"
-                style={{ background: 'rgba(255,255,255,0.05)' }}
-              >
-                <input
-                  readOnly
-                  placeholder="Ask FinPilot AI anything..."
-                  className="flex-1 bg-transparent text-sm text-white/60 outline-none placeholder-white/25"
-                />
-                <button
-                  className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:opacity-80"
-                  style={{ background: C.amber }}
-                >
-                  <Send className="w-3.5 h-3.5 text-white" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
@@ -787,7 +647,7 @@ function TestimonialsSection() {
           ))}
         </div>
         <p className="text-sm" style={{ color: '#4B5563' }}>
-          <span className="font-bold text-base" style={{ color: C.primary }}>50,000+</span>{' '}
+          <span className="font-bold text-base" style={{ color: C.primary }}>10+</span>{' '}
           people trust FinPilot with their finances
         </p>
       </div>

@@ -1,5 +1,5 @@
 import {
-  TrendingUp, Shield, BarChart3, PiggyBank, Receipt, Sparkles, Target
+  TrendingUp, Shield, BarChart3, PiggyBank, Receipt, Sparkles
 } from 'lucide-react';
 
 export const C = {
@@ -11,7 +11,7 @@ export const C = {
 
 export const FEATURES = [
   { icon: BarChart3, title: 'Smart Expense Tracking',   desc: 'Track every income and expense with intelligent categorization, account management, and real-time financial updates.', color: '#F59E0B', bg: '#FEF3C7' },
-  { icon: Sparkles,  title: 'AI Financial Advisor ⭐',  desc: 'Receive personalized spending insights, saving recommendations, budget alerts, and AI-powered financial guidance based on your transaction history.', color: '#16A34A', bg: '#DCFCE7' },
+  { icon: Sparkles,  title: 'AI Financial Insights',    desc: 'Receive personalized spending insights, saving recommendations, budget alerts, and AI-powered financial guidance based on your transaction history.', color: '#16A34A', bg: '#DCFCE7' },
   { icon: Receipt,   title: 'AI Receipt Scanner',       desc: 'Upload a receipt and let AI automatically extract merchant details, total amount, date, GST, and category for one-click expense entry.', color: '#8B5CF6', bg: '#EDE9FE' },
   { icon: PiggyBank, title: 'Intelligent Budget Planner', desc: 'Create monthly budgets, monitor spending progress, receive overspending alerts, and stay on track with your financial goals.', color: '#EC4899', bg: '#FCE7F3' },
   { icon: TrendingUp,title: 'Interactive Reports & Analytics', desc: 'Visualize income, expenses, savings, and spending trends with beautiful charts and export reports in PDF or Excel format.', color: '#3B82F6', bg: '#DBEAFE' },
@@ -34,14 +34,7 @@ export const FAQS = [
 
 export const NAV = [
   { label: 'Platform',     id: 'features' },
-  { label: 'AI Advisor',  id: 'ai-insights' },
-  { label: 'Review', id: 'testimonials' },
-  { label: 'Help Center',          id: 'faq' },
+  { label: 'Review',       id: 'testimonials' },
+  { label: 'Help Center',  id: 'faq' },
 ];
 
-export const AI_INSIGHTS = [
-  { icon: TrendingUp, text: 'You spent 18% more on food this month',         color: '#F59E0B' },
-  { icon: PiggyBank,  text: 'Cutting restaurants could save you ₹3,500',     color: '#16A34A' },
-  { icon: Target,     text: 'Travel expenses decreased by 12% — great job!', color: '#8B5CF6' },
-  { icon: Sparkles,   text: 'Your savings goal is 85% complete 🎉',           color: '#EC4899' },
-];
