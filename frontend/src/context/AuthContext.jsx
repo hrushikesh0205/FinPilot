@@ -68,8 +68,10 @@ export function AuthProvider({ children, onLogout }) {
     setLoading(true);
     setError(null);
     try {
-      // Step 1: Create the account
+      // Create the account (no auto-login — user must sign in explicitly)
       await registerUser(name, email, password);
+      setLoading(false);
+      return { success: true };
     } catch (err) {
       // Extract backend message from various response shapes:
       // { message: "..." }  OR  ErrorResponse { status, message, timestamp }  OR plain string
@@ -92,12 +94,6 @@ export function AuthProvider({ children, onLogout }) {
       setLoading(false);
       return { success: false, message };
     }
-
-    // Step 2: Auto-login after successful registration
-    // login() manages its own loading/error state, so reset ours first
-    setLoading(false);
-    const result = await login(email, password);
-    return result;
   };
 
   const logout = () => {

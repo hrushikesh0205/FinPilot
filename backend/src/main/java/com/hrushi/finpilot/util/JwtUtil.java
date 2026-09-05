@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -13,8 +14,16 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    private final Key SECRET_KEY =
-            Keys.hmacShaKeyFor("MySecretKeyForFinPilotProject123456".getBytes());
+    private final Key SECRET_KEY;
+
+    // Reads from application.properties: app.jwt.secret
+    public JwtUtil(@Value("${app.jwt.secret}") String secret,
+                   @Value("${app.jwt.expiration-ms}") long expirationMs) {
+        this.SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes());
+        this.expirationMs = expirationMs;
+    }
+
+    private final long expirationMs;
 
     // Generate JWT Token
     public String generateToken(String email) {
@@ -22,7 +31,7 @@ public class JwtUtil {
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hour
+                .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(SECRET_KEY, SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -67,4 +76,4 @@ public class JwtUtil {
 
         return username.equals(email) && !isTokenExpired(token);
     }
-}
+}

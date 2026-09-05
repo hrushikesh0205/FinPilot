@@ -11,8 +11,8 @@
 	<groupId>com.hrushi</groupId>
 	<artifactId>finpilot</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
+	<name>FinPilot</name>
+	<description>AI-powered Personal Finance Management REST API — Spring Boot + MySQL + JWT</description>
 	<url/>
 	<licenses>
 		<license/>

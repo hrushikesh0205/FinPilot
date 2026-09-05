@@ -14,6 +14,7 @@ export function RegisterPage({ setCurrentPage }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
 
   const { register, loading } = useAuth();
 
@@ -67,7 +68,11 @@ export function RegisterPage({ setCurrentPage }) {
 
     const result = await register(name.trim(), email, password);
     if (result.success) {
-      setCurrentPage('/dashboard');
+      setSuccessMsg('Account created successfully! Please sign in to continue.');
+      setErrorMsg('');
+      setTimeout(() => {
+        setCurrentPage('/login');
+      }, 2000);
     } else {
       setErrorMsg(result.message || 'Registration failed. Please try again.');
     }
@@ -113,6 +118,14 @@ export function RegisterPage({ setCurrentPage }) {
               <div className="flex items-center gap-2 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm font-medium">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
                 <span>{errorMsg}</span>
+              </div>
+            )}
+
+            {/* Success Banner */}
+            {successMsg && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-medium">
+                <Check className="w-4 h-4 flex-shrink-0" />
+                <span>{successMsg}</span>
               </div>
             )}
 

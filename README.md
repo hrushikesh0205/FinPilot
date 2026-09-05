@@ -97,31 +97,46 @@ FinPilot is a full-stack AI-powered Personal Finance Management application that
 # 📂 Project Structure
 
 ```
-FinPilot
+FinPilot/
 │
-├── backend
-│   ├── config
-│   ├── controller
-│   ├── dto
-│   ├── entity
-│   ├── repository
-│   ├── security
-│   ├── service
-│   ├── util
-│   └── resources
+├── backend/                            # Spring Boot REST API
+│   ├── src/main/java/com/hrushi/finpilot/
+│   │   ├── config/                     # CorsConfig, SwaggerConfig, WebMvcConfig
+│   │   ├── controller/                 # REST controllers (8 controllers)
+│   │   ├── dto/                        # Request/Response DTOs
+│   │   ├── entity/                     # JPA entities (User, Expense, Budget, …)
+│   │   ├── exception/                  # GlobalExceptionHandler, ErrorResponse
+│   │   ├── repository/                 # Spring Data JPA repositories
+│   │   ├── security/                   # SecurityConfig, JwtFilter
+│   │   ├── service/                    # Business logic services (8 services)
+│   │   └── util/                       # JwtUtil
+│   ├── src/main/resources/
+│   │   ├── application.properties      # Local config (gitignored — not committed)
+│   │   └── application.properties.example  # Safe template for developers
+│   └── pom.xml
 │
-├── frontend
-│   ├── api
-│   ├── components
-│   ├── context
-│   ├── pages
-│   ├── assets
-│   └── styles
+├── frontend/                           # React.js + Vite SPA
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── ui/                     # shadcn/ui components (19 components)
+│   │   │   ├── layout/                 # AppLayout, Navbar, Sidebar, SiteFooter
+│   │   │   └── common/                 # FinPilotLogo
+│   │   ├── context/                    # AuthContext, CurrencyContext, ThemeContext
+│   │   ├── hooks/                      # use-toast
+│   │   ├── pages/                      # 13 page components
+│   │   ├── services/                   # Axios API service files (9 files)
+│   │   ├── constants/                  # appData, landingData
+│   │   ├── utils/                      # utils.js (cn helper)
+│   │   └── styles/                     # index.css (Tailwind base)
+│   ├── index.html
+│   ├── vite.config.js
+│   ├── tailwind.config.js
+│   └── package.json
 │
+├── uploads/                            # Runtime: user profile images (gitignored)
+├── .gitignore
 └── README.md
 ```
-
----
 
 ---
 
