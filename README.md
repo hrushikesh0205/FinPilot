@@ -1,6 +1,3 @@
-
-
-```markdown
 # 💰 FinPilot – AI Personal Finance Manager
 
 FinPilot is a full-stack AI-powered Personal Finance Management application built to help users manage expenses, budgets, accounts, and financial reports from one place.
@@ -12,6 +9,7 @@ The application combines secure JWT authentication, real-time financial tracking
 ## 🚀 Features
 
 ### 🔐 Secure Authentication
+
 - User Registration & Login
 - JWT-based Authentication
 - Spring Security
@@ -20,6 +18,7 @@ The application combines secure JWT authentication, real-time financial tracking
 - Secure User Profile Management
 
 ### 💸 Expense Management
+
 - Add, Edit & Delete Expenses
 - Expense Categorization
 - Monthly Expense Tracking
@@ -27,20 +26,23 @@ The application combines secure JWT authentication, real-time financial tracking
 - Real-time Dashboard Updates
 
 ### 💳 Account Management
+
 - Create Multiple Accounts
 - Edit & Delete Accounts
 - Default Account Selection
 - Balance Management
 
 ### 📊 Budget Management
+
 - Create Monthly Budgets
 - Budget Progress Tracking
 - Category-wise Budget Monitoring
 - Overspending Alerts
 
 ### 🧾 AI Receipt Scanner
+
 - Upload Receipt Images
-- AI-powered OCR using a Vision-capable AI model
+- AI-powered OCR using a vision-capable AI model
 - Automatic extraction of:
   - Merchant Name
   - Invoice / Receipt Number
@@ -56,14 +58,16 @@ The application combines secure JWT authentication, real-time financial tracking
 - Save scanned receipt data directly as an expense
 
 ### 🤖 AI Financial Insights
+
 - Personalized spending analysis
 - Category-wise spending insights
 - Budget overrun detection
 - Financial health summary
 - Actionable saving recommendations
-- AI-generated insights based on the user's real financial data
+- AI-generated insights based on the user's actual financial data
 
 ### 📈 Reports & Analytics
+
 - Monthly Financial Reports
 - Category-wise Spending Analysis
 - Interactive Charts & Visualizations
@@ -71,66 +75,103 @@ The application combines secure JWT authentication, real-time financial tracking
 - PDF / Excel Report Export
 
 ### 🔔 Smart Notifications
+
 - Expense Notifications
 - Budget Alerts
 - AI Insight Notifications
 - Financial Activity Updates
 
 ### 👤 User Profile
+
 - Edit Profile Information
 - Dynamic Initials-based Avatar
 - Change Password
 - Secure Account Management
 
+The application uses a dynamic initials-based avatar instead of storing profile images.
+
+Example:
+
+    Hrushikesh Bhoir → HB
+
 ---
 
-## 🤖 AI Architecture
+## 🤖 AI Integration
 
-FinPilot uses a backend-based AI architecture to keep API credentials secure.
+FinPilot integrates AI through the Spring Boot backend using the OpenRouter API.
 
-### AI Receipt OCR
+The AI API key is never exposed to the React frontend.
 
-React Scanner
-      ↓
-Spring Boot REST API
-      ↓
-ReceiptScanService
-      ↓
-OpenRouterService
-      ↓
-Gemini 2.5 Flash
-      ↓
-Structured Receipt JSON
-      ↓
-React Frontend
+### 🧾 AI Receipt OCR
 
-### AI Financial Insights
+The receipt scanning process follows this flow:
 
-React Insights Page
-      ↓
-Spring Boot REST API
-      ↓
-FinancialInsightService
-      ↓
-Expense & Budget Data from MySQL
-      ↓
-Financial Data Aggregation
-      ↓
-OpenRouterService
-      ↓
-Gemini 2.5 Flash
-      ↓
-AI-generated Financial Insights
-      ↓
-React Frontend
+    React Scanner
+          ↓
+    aiApi.js
+          ↓
+    POST /api/ai/receipt/scan
+          ↓
+    AiController
+          ↓
+    ReceiptScanService
+          ↓
+    OpenRouterService
+          ↓
+    Gemini 2.5 Flash
+          ↓
+    Structured Receipt JSON
+          ↓
+    React Frontend
+          ↓
+    Review & Save Expense
 
-The OpenRouter API key is stored only on the backend and is never exposed to the frontend.
+The backend accepts the uploaded receipt image, converts it into a format suitable for the multimodal AI request, sends it to the configured AI model, and converts the AI response into structured receipt data.
+
+### 🤖 AI Financial Insights
+
+The financial insights process follows this flow:
+
+    React Insights Page
+          ↓
+    aiApi.js
+          ↓
+    GET /api/ai/insights
+          ↓
+    AiController
+          ↓
+    FinancialInsightService
+          ↓
+    ExpenseRepository + BudgetRepository
+          ↓
+    MySQL Financial Data
+          ↓
+    Financial Data Aggregation
+          ↓
+    OpenRouterService
+          ↓
+    Gemini 2.5 Flash
+          ↓
+    AI-generated Financial Insights
+          ↓
+    React Frontend
+
+The AI analysis uses the authenticated user's actual expense and budget data to generate personalized financial insights and recommendations.
+
+### 🔒 AI Security
+
+- OpenRouter API calls are handled only by the Spring Boot backend.
+- The OpenRouter API key is never exposed to the frontend.
+- AI endpoints are protected using JWT authentication.
+- AI configuration is stored in the local `application.properties` file.
+- `application.properties` is excluded from Git using `.gitignore`.
 
 ---
 
 ## 🛠 Tech Stack
 
 ### Backend
+
 - Java
 - Spring Boot 3
 - Spring Security
@@ -142,8 +183,10 @@ The OpenRouter API key is stored only on the backend and is never exposed to the
 - Spring RestClient
 
 ### Frontend
+
 - React.js
-- JavaScript (JSX)
+- JavaScript
+- JSX
 - Vite
 - Tailwind CSS
 - Axios
@@ -151,9 +194,11 @@ The OpenRouter API key is stored only on the backend and is never exposed to the
 - Chart.js
 
 ### Database
+
 - MySQL
 
 ### AI Integration
+
 - OpenRouter API
 - Gemini 2.5 Flash
 - Multimodal AI / Vision
@@ -162,282 +207,522 @@ The OpenRouter API key is stored only on the backend and is never exposed to the
 
 ---
 
+## 🏗️ Architecture
+
+FinPilot follows a layered full-stack architecture.
+
+    React.js Frontend
+            ↓
+        Axios API
+            ↓
+    Spring Boot REST API
+            ↓
+    ┌─────────────────────────────┐
+    │       Controller Layer      │
+    └─────────────────────────────┘
+            ↓
+    ┌─────────────────────────────┐
+    │        Service Layer        │
+    └─────────────────────────────┘
+            ↓
+    ┌─────────────────────────────┐
+    │      Repository Layer       │
+    └─────────────────────────────┘
+            ↓
+          MySQL
+
+For authentication:
+
+    React Login
+          ↓
+    AuthController
+          ↓
+    Spring Security
+          ↓
+    AuthenticationManager
+          ↓
+    UserDetailsService
+          ↓
+    JWT Generation
+          ↓
+    JWT returned to frontend
+
+For protected requests:
+
+    React Request
+          ↓
+    JWT Bearer Token
+          ↓
+    JwtFilter
+          ↓
+    Spring Security
+          ↓
+    Controller
+          ↓
+    Service
+          ↓
+    Repository
+          ↓
+    MySQL
+
+---
+
 ## 📂 Project Structure
 
-FinPilot/
-│
-├── backend/
-│   ├── src/main/java/com/hrushi/finpilot/
-│   │   │
-│   │   ├── ai/
-│   │   │   ├── AiController.java
-│   │   │   ├── OpenRouterService.java
-│   │   │   ├── ReceiptScanService.java
-│   │   │   └── FinancialInsightService.java
-│   │   │
-│   │   ├── config/
-│   │   │   ├── CorsConfig.java
-│   │   │   ├── SwaggerConfig.java
-│   │   │   └── WebMvcConfig.java
-│   │   │
-│   │   ├── controller/
-│   │   │   ├── AccountController.java
-│   │   │   ├── AuthController.java
-│   │   │   ├── BudgetController.java
-│   │   │   ├── CategoryController.java
-│   │   │   ├── DashboardController.java
-│   │   │   ├── ExpenseController.java
-│   │   │   ├── NotificationController.java
-│   │   │   └── ReportController.java
-│   │   │
-│   │   ├── dto/
-│   │   │   ├── AccountRequest.java
-│   │   │   ├── BudgetRequest.java
-│   │   │   ├── BudgetSummaryResponse.java
-│   │   │   ├── CategoryReportResponse.java
-│   │   │   ├── CategoryRequest.java
-│   │   │   ├── DashboardResponse.java
-│   │   │   ├── FinancialInsightResponse.java
-│   │   │   ├── LoginRequest.java
-│   │   │   ├── MonthlyReportResponse.java
-│   │   │   ├── ReceiptItem.java
-│   │   │   ├── ReceiptScanResponse.java
-│   │   │   └── ReportSummaryResponse.java
-│   │   │
-│   │   ├── entity/
-│   │   │   ├── Account.java
-│   │   │   ├── Budget.java
-│   │   │   ├── Category.java
-│   │   │   ├── Expense.java
-│   │   │   ├── Notification.java
-│   │   │   └── User.java
-│   │   │
-│   │   ├── exception/
-│   │   │   ├── ErrorResponse.java
-│   │   │   ├── GlobalExceptionHandler.java
-│   │   │   └── ResourceNotFoundException.java
-│   │   │
-│   │   ├── repository/
-│   │   │   ├── AccountRepository.java
-│   │   │   ├── BudgetRepository.java
-│   │   │   ├── CategoryRepository.java
-│   │   │   ├── ExpenseRepository.java
-│   │   │   ├── NotificationRepository.java
-│   │   │   └── UserRepository.java
-│   │   │
-│   │   ├── security/
-│   │   │   ├── JwtFilter.java
-│   │   │   └── SecurityConfig.java
-│   │   │
-│   │   ├── service/
-│   │   │   ├── AccountService.java
-│   │   │   ├── BudgetService.java
-│   │   │   ├── CategoryService.java
-│   │   │   ├── CustomUserDetailsService.java
-│   │   │   ├── ExpenseService.java
-│   │   │   ├── NotificationService.java
-│   │   │   ├── ReportService.java
-│   │   │   └── UserService.java
-│   │   │
-│   │   └── util/
-│   │       └── JwtUtil.java
-│   │
-│   ├── src/main/resources/
-│   │   ├── application.properties
-│   │   └── application.properties.example
-│   │
-│   └── pom.xml
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── ui/
-│   │   │   ├── layout/
-│   │   │   └── common/
-│   │   │
-│   │   ├── context/
-│   │   ├── hooks/
-│   │   ├── pages/
-│   │   ├── services/
-│   │   ├── constants/
-│   │   ├── utils/
-│   │   └── styles/
-│   │
-│   ├── index.html
-│   ├── vite.config.js
-│   ├── tailwind.config.js
-│   └── package.json
-│
-├── .gitignore
-└── README.md
+    FinPilot/
+    │
+    ├── backend/
+    │   ├── src/
+    │   │   ├── main/
+    │   │   │   ├── java/
+    │   │   │   │   └── com/
+    │   │   │   │       └── hrushi/
+    │   │   │   │           └── finpilot/
+    │   │   │   │
+    │   │   │   │               ├── ai/
+    │   │   │   │               │   ├── AiController.java
+    │   │   │   │               │   ├── OpenRouterService.java
+    │   │   │   │               │   ├── ReceiptScanService.java
+    │   │   │   │               │   └── FinancialInsightService.java
+    │   │   │   │               │
+    │   │   │   │               ├── config/
+    │   │   │   │               │   ├── CorsConfig.java
+    │   │   │   │               │   ├── SwaggerConfig.java
+    │   │   │   │               │   └── WebMvcConfig.java
+    │   │   │   │               │
+    │   │   │   │               ├── controller/
+    │   │   │   │               │   ├── AccountController.java
+    │   │   │   │               │   ├── AuthController.java
+    │   │   │   │               │   ├── BudgetController.java
+    │   │   │   │               │   ├── CategoryController.java
+    │   │   │   │               │   ├── DashboardController.java
+    │   │   │   │               │   ├── ExpenseController.java
+    │   │   │   │               │   ├── NotificationController.java
+    │   │   │   │               │   └── ReportController.java
+    │   │   │   │               │
+    │   │   │   │               ├── dto/
+    │   │   │   │               │   ├── AccountRequest.java
+    │   │   │   │               │   ├── BudgetRequest.java
+    │   │   │   │               │   ├── BudgetSummaryResponse.java
+    │   │   │   │               │   ├── CategoryReportResponse.java
+    │   │   │   │               │   ├── CategoryRequest.java
+    │   │   │   │               │   ├── DashboardResponse.java
+    │   │   │   │               │   ├── FinancialInsightResponse.java
+    │   │   │   │               │   ├── LoginRequest.java
+    │   │   │   │               │   ├── MonthlyReportResponse.java
+    │   │   │   │               │   ├── ReceiptItem.java
+    │   │   │   │               │   ├── ReceiptScanResponse.java
+    │   │   │   │               │   └── ReportSummaryResponse.java
+    │   │   │   │               │
+    │   │   │   │               ├── entity/
+    │   │   │   │               │   ├── Account.java
+    │   │   │   │               │   ├── Budget.java
+    │   │   │   │               │   ├── Category.java
+    │   │   │   │               │   ├── Expense.java
+    │   │   │   │               │   ├── Notification.java
+    │   │   │   │               │   └── User.java
+    │   │   │   │               │
+    │   │   │   │               ├── exception/
+    │   │   │   │               │   ├── ErrorResponse.java
+    │   │   │   │               │   ├── GlobalExceptionHandler.java
+    │   │   │   │               │   └── ResourceNotFoundException.java
+    │   │   │   │               │
+    │   │   │   │               ├── repository/
+    │   │   │   │               │   ├── AccountRepository.java
+    │   │   │   │               │   ├── BudgetRepository.java
+    │   │   │   │               │   ├── CategoryRepository.java
+    │   │   │   │               │   ├── ExpenseRepository.java
+    │   │   │   │               │   ├── NotificationRepository.java
+    │   │   │   │               │   └── UserRepository.java
+    │   │   │   │               │
+    │   │   │   │               ├── security/
+    │   │   │   │               │   ├── JwtFilter.java
+    │   │   │   │               │   └── SecurityConfig.java
+    │   │   │   │               │
+    │   │   │   │               ├── service/
+    │   │   │   │               │   ├── AccountService.java
+    │   │   │   │               │   ├── BudgetService.java
+    │   │   │   │               │   ├── CategoryService.java
+    │   │   │   │               │   ├── CustomUserDetailsService.java
+    │   │   │   │               │   ├── ExpenseService.java
+    │   │   │   │               │   ├── NotificationService.java
+    │   │   │   │               │   ├── ReportService.java
+    │   │   │   │               │   └── UserService.java
+    │   │   │   │               │
+    │   │   │   │               └── util/
+    │   │   │   │                   └── JwtUtil.java
+    │   │   │   │
+    │   │   │   └── resources/
+    │   │   │       ├── application.properties
+    │   │   │       └── application.properties.example
+    │   │   │
+    │   │   └── test/
+    │   │       └── java/
+    │   │
+    │   ├── pom.xml
+    │   ├── mvnw
+    │   └── mvnw.cmd
+    │
+    ├── frontend/
+    │   ├── src/
+    │   │   ├── components/
+    │   │   │   ├── charts/
+    │   │   │   ├── common/
+    │   │   │   │   └── FinPilotLogo.jsx
+    │   │   │   ├── dashboard/
+    │   │   │   ├── layout/
+    │   │   │   │   ├── AppLayout.jsx
+    │   │   │   │   ├── Navbar.jsx
+    │   │   │   │   ├── Sidebar.jsx
+    │   │   │   │   └── SiteFooter.jsx
+    │   │   │   ├── receipt/
+    │   │   │   └── ui/
+    │   │   │
+    │   │   ├── constants/
+    │   │   │   ├── appData.jsx
+    │   │   │   └── landingData.jsx
+    │   │   │
+    │   │   ├── context/
+    │   │   │   ├── AuthContext.jsx
+    │   │   │   ├── CurrencyContext.jsx
+    │   │   │   └── ThemeContext.jsx
+    │   │   │
+    │   │   ├── hooks/
+    │   │   │   └── use-toast.js
+    │   │   │
+    │   │   ├── pages/
+    │   │   │   ├── AccountsPage.jsx
+    │   │   │   ├── BudgetsPage.jsx
+    │   │   │   ├── CategoriesPage.jsx
+    │   │   │   ├── DashboardPage.jsx
+    │   │   │   ├── ExpensesPage.jsx
+    │   │   │   ├── HelpPage.jsx
+    │   │   │   ├── InsightsPage.jsx
+    │   │   │   ├── LandingPage.jsx
+    │   │   │   ├── LoginPage.jsx
+    │   │   │   ├── NotFoundPage.jsx
+    │   │   │   ├── NotificationsPage.jsx
+    │   │   │   ├── ProfilePage.jsx
+    │   │   │   ├── RegisterPage.jsx
+    │   │   │   ├── ReportsPage.jsx
+    │   │   │   ├── ScannerPage.jsx
+    │   │   │   └── SettingsPage.jsx
+    │   │   │
+    │   │   ├── services/
+    │   │   │   ├── accountApi.js
+    │   │   │   ├── aiApi.js
+    │   │   │   ├── authApi.js
+    │   │   │   ├── axiosInstance.js
+    │   │   │   ├── budgetApi.js
+    │   │   │   ├── categoryApi.js
+    │   │   │   ├── dashboardApi.js
+    │   │   │   ├── expenseApi.js
+    │   │   │   ├── notificationApi.js
+    │   │   │   └── reportApi.js
+    │   │   │
+    │   │   ├── styles/
+    │   │   │   └── index.css
+    │   │   │
+    │   │   ├── utils/
+    │   │   │
+    │   │   ├── App.jsx
+    │   │   └── main.jsx
+    │   │
+    │   ├── .env.example
+    │   ├── index.html
+    │   ├── package.json
+    │   ├── package-lock.json
+    │   ├── tailwind.config.js
+    │   └── vite.config.js
+    │
+    ├── .gitignore
+    └── README.md
 
 ---
 
 ## 📌 REST APIs
 
-### Authentication
+### 🔐 Authentication APIs
 
-| Method | Endpoint |
-|--------|----------|
-| POST | `/auth/register` |
-| POST | `/auth/login` |
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| POST | `/auth/register` | Register a new user |
+| POST | `/auth/login` | Authenticate user and generate JWT |
 
-### Expenses
+### 💸 Expense APIs
 
-| Method | Endpoint |
-|--------|----------|
-| GET | `/expenses` |
-| POST | `/expenses` |
-| PUT | `/expenses/{id}` |
-| DELETE | `/expenses/{id}` |
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| GET | `/expenses` | Get user expenses |
+| POST | `/expenses` | Create an expense |
+| PUT | `/expenses/{id}` | Update an expense |
+| DELETE | `/expenses/{id}` | Delete an expense |
 
-### Categories
+### 🏷️ Category APIs
 
-| Method | Endpoint |
-|--------|----------|
-| GET | `/categories` |
-| POST | `/categories` |
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| GET | `/categories` | Get categories |
+| POST | `/categories` | Create a category |
 
-### Accounts
+### 💳 Account APIs
 
-| Method | Endpoint |
-|--------|----------|
-| GET | `/accounts` |
-| POST | `/accounts` |
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| GET | `/accounts` | Get user accounts |
+| POST | `/accounts` | Create an account |
 
-### Budgets
+### 📊 Budget APIs
 
-| Method | Endpoint |
-|--------|----------|
-| GET | `/budgets` |
-| POST | `/budgets` |
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| GET | `/budgets` | Get user budgets |
+| POST | `/budgets` | Create a budget |
 
-### AI Features
+### 🤖 AI APIs
 
-| Method | Endpoint |
-|--------|----------|
-| POST | `/api/ai/receipt/scan` |
-| GET | `/api/ai/insights` |
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| POST | `/api/ai/receipt/scan` | Scan receipt image and extract structured data |
+| GET | `/api/ai/insights` | Generate personalized financial insights |
 
-All AI endpoints are protected using JWT authentication.
+All AI endpoints require a valid JWT authentication token.
 
 ---
 
 ## 🔒 Security
 
-FinPilot follows a secure backend architecture:
+FinPilot uses Spring Security and JWT-based authentication to secure application resources.
 
-React Frontend
-      ↓
-JWT Authentication
-      ↓
-Spring Security
-      ↓
-Spring Boot REST API
-      ↓
-Business Logic
-      ↓
-MySQL / OpenRouter
+### Authentication Flow
 
-### API Key Security
+    User Login
+        ↓
+    AuthController
+        ↓
+    AuthenticationManager
+        ↓
+    UserDetailsService
+        ↓
+    BCrypt Password Verification
+        ↓
+    JWT Token Generation
+        ↓
+    Token returned to React
 
-The OpenRouter API key is never stored in the frontend.
+For every protected request:
 
-Local configuration is maintained in:
+    React Frontend
+        ↓
+    Authorization: Bearer <JWT>
+        ↓
+    JwtFilter
+        ↓
+    JWT Validation
+        ↓
+    Spring Security
+        ↓
+    Controller
+        ↓
+    Service
+        ↓
+    Repository
+        ↓
+    MySQL
 
-backend/src/main/resources/application.properties
+### Security Features
 
-The file is excluded from Git using `.gitignore`.
+- JWT-based authentication
+- Spring Security
+- BCrypt password hashing
+- Protected REST APIs
+- JWT request filtering using `JwtFilter`
+- Authenticated AI endpoints
+- User-specific financial data access
+- Backend-only OpenRouter API communication
 
-A safe configuration template is provided through:
+### API Key Protection
 
-application.properties.example
+The OpenRouter API key is stored only in:
+
+    backend/src/main/resources/application.properties
+
+This file is excluded from Git using `.gitignore`.
+
+A safe template is provided as:
+
+    backend/src/main/resources/application.properties.example
+
+Never commit:
+
+- Database passwords
+- JWT secrets
+- OpenRouter API keys
+
+---
+
+## 🗄️ Database
+
+FinPilot uses MySQL as its relational database.
+
+### Create Database
+
+    CREATE DATABASE finpilot;
+
+Configure the database connection in:
+
+    backend/src/main/resources/application.properties
+
+Example:
+
+    spring.datasource.url=jdbc:mysql://localhost:3306/finpilot
+    spring.datasource.username=YOUR_USERNAME
+    spring.datasource.password=YOUR_PASSWORD
+
+Hibernate / JPA is used for object-relational mapping between Java entities and MySQL tables.
+
+The main entities include:
+
+- User
+- Expense
+- Category
+- Account
+- Budget
+- Notification
+
+---
+
+## ⚙️ Configuration
+
+Create or configure:
+
+    backend/src/main/resources/application.properties
 
 Example configuration:
 
-spring.datasource.url=YOUR_DATABASE_URL
-spring.datasource.username=YOUR_USERNAME
-spring.datasource.password=YOUR_PASSWORD
+    spring.application.name=finpilot
 
-app.jwt.secret=YOUR_STRONG_JWT_SECRET
+    spring.datasource.url=jdbc:mysql://localhost:3306/finpilot
+    spring.datasource.username=YOUR_USERNAME
+    spring.datasource.password=YOUR_PASSWORD
 
-openrouter.api.key=${OPENROUTER_API_KEY}
-openrouter.base-url=https://openrouter.ai/api/v1
-openrouter.model=google/gemini-2.5-flash
+    app.jwt.secret=YOUR_STRONG_JWT_SECRET
+    app.jwt.expiration-ms=3600000
 
-Never commit real database passwords, JWT secrets, or OpenRouter API keys.
+    openrouter.api.key=YOUR_OPENROUTER_API_KEY
+    openrouter.base-url=https://openrouter.ai/api/v1
+    openrouter.model=google/gemini-2.5-flash
+
+Do not commit the real values to GitHub.
 
 ---
 
 ## ▶️ Getting Started
 
-### 1. Clone Repository
+### 1. Clone the Repository
 
-git clone https://github.com/hrushikesh0205/FinPilot.git
-cd FinPilot
+    git clone https://github.com/hrushikesh0205/FinPilot.git
+    cd FinPilot
 
-### 2. Database Setup
+### 2. Setup MySQL
 
-Create a MySQL database:
+Create the database:
 
-CREATE DATABASE finpilot;
+    CREATE DATABASE finpilot;
 
-Configure the database credentials in:
+Then configure the MySQL username and password in:
 
-backend/src/main/resources/application.properties
+    backend/src/main/resources/application.properties
 
-Example:
+### 3. Configure OpenRouter
 
-spring.datasource.url=jdbc:mysql://localhost:3306/finpilot
-spring.datasource.username=YOUR_USERNAME
-spring.datasource.password=YOUR_PASSWORD
+Add your OpenRouter API key to the local backend configuration:
 
-Hibernate/JPA will create/update the required tables based on the configured entities.
+    openrouter.api.key=YOUR_OPENROUTER_API_KEY
 
-### 3. OpenRouter Configuration
+The key must remain on the backend and should never be placed inside the React frontend.
 
-Add your OpenRouter API key to the local `application.properties`:
+### 4. Run the Backend
 
-openrouter.api.key=YOUR_OPENROUTER_API_KEY
-openrouter.base-url=https://openrouter.ai/api/v1
-openrouter.model=google/gemini-2.5-flash
+Open a terminal:
 
-Do not add the real API key to GitHub.
+    cd backend
+    mvn spring-boot:run
 
-### 4. Run Backend
+The backend runs on:
 
-cd backend
-mvn spring-boot:run
+    http://localhost:8080
 
-Backend runs on:
-
-http://localhost:8080
-
-### 5. Run Frontend
+### 5. Run the Frontend
 
 Open another terminal:
 
-cd frontend
-npm install
-npm run dev
+    cd frontend
+    npm install
+    npm run dev
 
-Frontend runs on:
+The frontend runs on:
 
-http://localhost:5173
+    http://localhost:5173
+
+---
+
+## 🧪 AI Feature Testing
+
+### Receipt Scanner
+
+1. Login to FinPilot.
+2. Open **Receipt Scanner**.
+3. Upload a receipt image.
+4. The image is sent to the Spring Boot backend.
+5. The backend sends the receipt to the configured OpenRouter AI model.
+6. The AI extracts the receipt information.
+7. The extracted information is displayed in the frontend.
+8. Review or edit the fields.
+9. Save the expense.
+
+### AI Financial Insights
+
+1. Login to FinPilot.
+2. Open **AI Insights**.
+3. The frontend calls the secured AI insights endpoint.
+4. The backend retrieves the authenticated user's expense and budget information.
+5. The financial data is aggregated.
+6. The backend sends the relevant data to the AI model.
+7. AI-generated insights and recommendations are returned.
+8. The frontend displays personalized financial insights.
 
 ---
 
 ## 📸 Screenshots
 
-Add application screenshots here:
+### Landing Page
 
-- Landing Page
-- Dashboard
-- Expense Management
-- Budget Management
-- AI Receipt Scanner
-- AI Financial Insights
-- Reports & Analytics
+_Add screenshot here._
+
+### Dashboard
+
+_Add screenshot here._
+
+### Expense Management
+
+_Add screenshot here._
+
+### Budget Management
+
+_Add screenshot here._
+
+### AI Receipt Scanner
+
+_Add screenshot here._
+
+### AI Financial Insights
+
+_Add screenshot here._
+
+### Reports & Analytics
+
+_Add screenshot here._
 
 ---
 
@@ -452,14 +737,43 @@ Add application screenshots here:
 
 ---
 
+## 📚 Key Concepts Demonstrated
+
+This project demonstrates practical implementation of:
+
+- Full-stack application development
+- REST API design
+- Layered architecture
+- Spring Boot
+- Spring Security
+- JWT authentication
+- BCrypt password encryption
+- Spring Data JPA
+- Hibernate ORM
+- MySQL database integration
+- React.js
+- Axios API integration
+- Protected frontend routes
+- AI API integration
+- Multimodal AI / Vision
+- OCR-based data extraction
+- AI-powered financial analysis
+- Backend API security
+- DTO-based request and response handling
+- Global exception handling
+
+---
+
 ## 👨‍💻 Developer
 
 **Hrushikesh Bhoir**
 
-GitHub:
+### GitHub
+
 https://github.com/hrushikesh0205/FinPilot
 
-LinkedIn:
+### LinkedIn
+
 https://www.linkedin.com/in/hrushikesh-bhoir/
 
 ---
@@ -467,4 +781,3 @@ https://www.linkedin.com/in/hrushikesh-bhoir/
 ## ⭐ Show Your Support
 
 If you found FinPilot useful, consider giving the repository a ⭐ on GitHub.
-```
