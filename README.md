@@ -399,15 +399,6 @@ Frontend:
 
 ---
 
-# 📸 Screenshots
-
-* Landing Page
-* Dashboard
-* Expense Management
-* Budget Management
-* AI Receipt Scanner
-* AI Financial Insights
-* Reports & Analytics
 
 ---
 
