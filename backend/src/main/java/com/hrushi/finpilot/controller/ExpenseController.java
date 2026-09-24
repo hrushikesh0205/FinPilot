@@ -1,0 +1,130 @@
+package com.hrushi.finpilot.controller;
+
+import com.hrushi.finpilot.entity.Expense;
+import com.hrushi.finpilot.service.ExpenseService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+import java.time.LocalDate;
+import org.springframework.web.bind.annotation.RequestParam;
+import java.util.List;
+import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+@RestController
+@RequestMapping("/expenses")
+public class ExpenseController {
+
+    @Autowired
+    private ExpenseService expenseService;
+
+    // Add Expense
+    @PostMapping
+    public Expense addExpense(@Valid @RequestBody Expense expense,
+                              Authentication authentication) {
+
+        String email = authentication.getName();
+
+        return expenseService.saveExpense(expense, email);
+    }
+
+    // Get All Expenses of Logged-in User
+    @GetMapping
+    public List<Expense> getAllExpenses(Authentication authentication) {
+
+        String email = authentication.getName();
+
+        return expenseService.getAllExpenses(email);
+    }
+
+    // Get Expense By id (ownership protected)
+    @GetMapping("/{id}")
+    public Expense getExpenseById(@PathVariable Long id, Authentication authentication) {
+        String email = authentication.getName();
+        return expenseService.getExpenseById(id, email);
+    }
+
+    // Pre-check for duplicate transaction
+    @GetMapping("/check-duplicate")
+    public java.util.Map<String, Boolean> checkDuplicate(
+            @RequestParam LocalDate date,
+            @RequestParam String title,
+            @RequestParam Double amount,
+            @RequestParam(defaultValue = "Cash") String account,
+            Authentication authentication) {
+        String email = authentication.getName();
+        boolean exists = expenseService.isDuplicate(date, title, amount, account, email);
+        return java.util.Map.of("isDuplicate", exists);
+    }
+
+    // Update Expense (Only Owner)
+    @PutMapping("/{id}")
+    public Expense updateExpense(@PathVariable Long id,
+                                 @RequestBody Expense expense,
+                                 Authentication authentication) {
+
+        String email = authentication.getName();
+
+        return expenseService.updateExpense(id, expense, email);
+    }
+
+    // Delete Expense (Only Owner)
+    @DeleteMapping("/{id}")
+    public String deleteExpense(@PathVariable Long id,
+                                Authentication authentication) {
+
+        String email = authentication.getName();
+
+        return expenseService.deleteExpense(id, email);
+    }
+    // Get Expenses By Category
+    @GetMapping("/category/{category}")
+    public List<Expense> getExpensesByCategory(
+            @PathVariable String category,
+            Authentication authentication) {
+
+        String email = authentication.getName();
+
+        return expenseService.getExpensesByCategory(category, email);
+    }
+    // Get Expenses By Date
+    @GetMapping("/date/{expenseDate}")
+    public List<Expense> getExpensesByDate(
+            @PathVariable LocalDate expenseDate,
+            Authentication authentication) {
+
+        String email = authentication.getName();
+
+        return expenseService.getExpensesByDate(expenseDate, email);
+    }
+    @GetMapping("/search")
+    public List<Expense> searchExpenses(
+            @RequestParam String keyword,
+            Authentication authentication) {
+
+        String email = authentication.getName();
+
+        return expenseService.searchExpenses(keyword, email);
+    }
+    // Get Expenses with Pagination
+    @GetMapping("/paginated")
+    public Page<Expense> getExpensesWithPagination(
+            @RequestParam int page,
+            @RequestParam int size,
+            Authentication authentication) {
+
+        String email = authentication.getName();
+
+        return expenseService.getExpensesWithPagination(email, page, size);
+    }
+    // Sort Expenses
+    @GetMapping("/sort")
+    public List<Expense> sortExpenses(
+            @RequestParam String field,
+            @RequestParam(defaultValue = "asc") String direction,
+            Authentication authentication) {
+
+        String email = authentication.getName();
+
+        return expenseService.getSortedExpenses(email, field, direction);
+    }
+}

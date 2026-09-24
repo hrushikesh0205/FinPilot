@@ -1,0 +1,54 @@
+# FinPilot Root .gitignore
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE & Editor Files
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Java & Maven (Backend)
+**/target/
+**/.mvn/wrapper/maven-wrapper.jar
+backend/HELP.md
+backend/.idea/
+
+# Node & Build (Frontend)
+**/node_modules/
+**/dist/
+**/dist-ssr/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+
+# Spring Boot application secrets — never commit real credentials
+**/application.properties
+!**/application.properties.example
+
+# Runtime Uploads & Logs
+uploads/*
+!uploads/.gitkeep
+backend/uploads/*
+!backend/uploads/.gitkeep
+logs/
+*.log
+
+# Automated Tools
+.github/modernize/
